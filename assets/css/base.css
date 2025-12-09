@@ -1,9 +1,9 @@
 /* ==========================================================================
    FILE: assets/css/base.css
-   描述: 基础排版 + 统一的公式布局 (强制不换行修复)
+   描述: 基础排版 + 极致丝滑的移动端滑动体验
    ========================================================================== */
 
-/* ================== 1. 原始视觉样式 (保留) ================== */
+/* ================== 1. 原始视觉样式 (保持不变) ================== */
 html { scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
@@ -23,8 +23,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 1.5em; margin-bottom: 0.75em; word-break: break-word;
 }
 h1 { font-size: 2.2em; margin-top: 0.5em; border-bottom: 3px solid var(--accent); padding-bottom: 0.3em; }
-h2 { font-size: 1.8em; border-bottom: 2px solid var(--muted); padding-bottom: 0.25em; position: relative; padding-left: 0;
-border-left: none; }
+h2 { font-size: 1.8em; border-bottom: 2px solid var(--muted); padding-bottom: 0.25em; position: relative; padding-left: 1.8em; }
 h3 { font-size: 1.15em; color: var(--text); position: relative; padding-left: 1.8em; margin-top: 1.2em; }
 
 p { margin: 1em 0; text-align: justify; }
@@ -51,7 +50,7 @@ a.ref-link:hover { background-color: rgba(74, 144, 226, 0.1); text-decoration: n
 
 
 /* ==========================================================================
-   2. 数学公式布局系统 (统一布局版)
+   2. 数学公式布局系统 (触控优化版)
    ========================================================================== */
 
 /* 1. 基础容器 */
@@ -61,77 +60,81 @@ a.ref-link:hover { background-color: rgba(74, 144, 226, 0.1); text-decoration: n
   clear: both;
 }
 
-/* 2. 滚动笼子 (公式主体) */
+/* 2. 滚动笼子 (重点优化区域) */
 .math-scroll-view {
-  /* Flex item 设置 */
-  flex: 1; 
-  width: 0; 
-  min-width: 0;
+  width: 100%;
   
-  /* 滚动设置 */
-  overflow-x: auto; 
+  /* Flex 适配 */
+  flex: 1; width: 0; min-width: 0;
+  
+  /* 滚动机制 */
+  overflow-x: auto;
   overflow-y: hidden;
   text-align: center;
-  -webkit-overflow-scrolling: touch;
   padding-bottom: 6px;
+  
+  /* 💥 [新增] 移动端触控核心优化 */
+  -webkit-overflow-scrolling: touch; /* iOS 惯性滚动 */
+  touch-action: pan-x;               /* 告诉浏览器：这里专门处理水平滑动，不要等待点击 */
+  -webkit-tap-highlight-color: transparent; /* 禁止点击时出现蓝色高亮块 */
+  cursor: grab;                      /* 鼠标变成抓手，提示可拖动 */
+  user-select: text;                 /* 允许复制，但不允许大块误选 */
 }
-/* 滚动条 */
+
+/* 滚动条样式 */
 .math-scroll-view::-webkit-scrollbar, mjx-container::-webkit-scrollbar { height: 6px; background: transparent; }
 .math-scroll-view::-webkit-scrollbar-thumb, mjx-container::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
 .math-scroll-view:hover::-webkit-scrollbar-thumb, mjx-container:hover::-webkit-scrollbar-thumb { background: var(--accent); }
 
-/* 3. 右侧信息栏 (序号 + 标题) */
+/* 3. 右侧信息栏 (序号) */
 .math-info {
-  flex-shrink: 0;           /* 💥 严禁被压缩 */
-  margin-left: 1rem;        /* 💥 与公式保持距离 */
-  
+  flex-shrink: 0;
+  margin-left: 20px;
   display: flex;
-  align-items: center;      /* 内部垂直居中 */
+  align-items: center;
   justify-content: flex-end;
-  
   font-size: 0.95em;
   color: var(--muted);
-  white-space: nowrap;      /* 💥 严禁换行 */
+  white-space: nowrap;
 }
+.math-name { margin-left: 0.8em; font-style: italic; opacity: 0.8; color: var(--muted); }
 
-/* 公式名称 (例如 "勾股定理") */
-.math-name {
-  margin-left: 0.8em;       /* 与序号的间距 */
-  font-style: italic;
-  opacity: 0.8;
-  color: var(--muted);      /* 默认为灰色 */
-}
-
-/* 4. MathJax 兜底 */
+/* 4. MathJax 容器 (传递触控属性) */
 mjx-container[display="true"] {
   display: block !important; overflow-x: auto !important; overflow-y: hidden;
   max-width: 100% !important; width: 100% !important; margin: 0.5em 0 !important; padding-bottom: 4px;
+  
+  /* 💥 [新增] 传递触控优化 */
+  touch-action: pan-x;
+  -webkit-tap-highlight-color: transparent;
 }
+
 .math-scroll-view mjx-container[display="true"] {
   display: inline-block !important; overflow: visible !important;
   max-width: none !important; width: auto !important; margin: 0 !important; vertical-align: middle;
+  
+  /* 💥 [新增] 禁止 MathJax 内部拦截点击事件，确保滑动优先 */
+  /* pointer-events: none; 不要加这个，否则不能长按复制公式 */
 }
 mjx-math { outline: none; }
 
 
-/* ================== 响应式与桌面布局 ================== */
+/* ================== 响应式布局 ================== */
 
-/* 桌面端：所有公式（无论是否彩色）强制左右排列，不换行 */
 @media (min-width: 769px) {
   .math-display-block {
     display: flex;
-    flex-wrap: nowrap;        /* 💥 核心修复：禁止换行 */
-    align-items: center;      /* 💥 核心修复：垂直居中 */
+    align-items: center;
     justify-content: space-between;
+    gap: 10px;
   }
 }
 
-/* 移动端：堆叠 */
 @media (max-width: 768px) {
   .math-display-block { display: block; }
   .math-scroll-view { display: block; width: 100%; }
   
-  /* 手机端信息栏：右对齐，在下方 */
+  /* 手机端信息栏 */
   .math-info {
     display: block;
     width: 100%;
