@@ -1,182 +1,96 @@
 /* ==========================================================================
    FILE: assets/css/layout.css
-   描述: 页面宏观布局、侧边栏、响应式规则
+   描述: 页面宏观布局 (H2 强制清除版)
    ========================================================================== */
-
-/* ================== 内容区域 ================== */
 .content {
-  padding: 2em 3em;           /* 桌面端默认内边距 */
+  padding: 2em 3em;           /* 桌面端 */
   margin-left: 0;
   max-width: 1200px;
   min-height: 100vh;
   transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  /* 关键：防止正文撑开页面 */
   box-sizing: border-box;
-  overflow-x: hidden; 
+  overflow-x: hidden;         /* 禁止正文溢出 */
   width: 100%;
 }
 
-/* 覆盖 H2/H3 样式 (base.css 提供基础，这里提供布局间距) */
+/* ================== 标题覆盖样式 ================== */
+
+/* H2: 章节标题 - 强制清除左侧竖线 */
 main.content h2 {
   margin-top: 60px;
   margin-bottom: 25px;
   color: #d73a49;
-  text-align: center;
-  border-left: none;          /* 移除 base.css 的左侧线，改为居中 */
-  border-bottom: none;
-  padding-left: 0;
+  text-align: center; /* 居中对齐 */
+  
+  /* 1. 物理边框清除 (使用 !important 提高优先级) */
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  
+  /* 保留底部下划线 (如果您不想要下划线，把下面这行改为 none !important) */
+  border-bottom: 2px solid rgba(0,0,0,0.1) !important;
+  
+  /* 2. 内边距重置 */
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 0.5em;
+  
+  /* 3. 背景重置 */
+  background: transparent !important;
 }
 
+/* 4. 💥 核心修复：彻底消灭伪元素 (往往线就是这玩意画的) */
+main.content h2::before,
+main.content h2::after {
+  content: none !important;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  border: none !important;
+}
+
+/* H3: 小节标题 - 保留左侧强调线 */
 main.content h3 {
   margin-top: 35px;
   margin-bottom: 15px;
   font-size: 1.2em;
-  padding-left: 0.8em;
-  border-left: 5px solid var(--accent);
+  padding-left: 0;
+  border-left:none; /*5px solid var(--accent);  👈 H3 保留了这个线 */
 }
 
-/* ================== 侧边栏容器 ================== */
+/* ================== 侧边栏 ================== */
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 280px;
-  height: 100%;
-  background: var(--toc-bg);
-  color: var(--toc-text);
-  padding: 1em 1em;
-  overflow-y: auto;
-  transform: translateX(-105%); /* 默认移出屏幕 */
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1000;
+  position: fixed; top: 0; left: 0; width: 280px; height: 100%;
+  background: var(--toc-bg); color: var(--toc-text);
+  padding: 1em 1em; overflow-y: auto;
+  transform: translateX(-105%); transition: transform 0.28s; z-index: 1000;
   box-shadow: 4px 0 20px rgba(0,0,0,0.05);
-  box-sizing: border-box;
 }
+.sidebar.open { transform: translateX(0); }
+.sidebar .brand { display: flex; align-items: center; margin-bottom: 1.2em; padding: 0 0.5em; }
+.sidebar .logo { width: 38px; height: 38px; border-radius: 8px; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 0.8em; }
+.sidebar-footer { margin-top: 2em; padding-top: 1em; border-top: 1px solid var(--muted); opacity: 0.8; }
+.theme-btn { width: 100%; padding: 0.6em; background: transparent; border: 1px solid var(--muted); color: var(--text); border-radius: 6px; cursor: pointer; }
+.theme-btn:hover { background: var(--accent); color: #fff; }
 
-.sidebar.open {
-  transform: translateX(0);
-}
-
-.sidebar .brand {
-  display: flex;
-  align-items: center;
-  margin: 0 0 1.2em 0;
-  padding: 0 0.5em;
-}
-
-.sidebar .brand .logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 1.2em;
-  margin-right: 0.8em;
-}
-
-.sidebar .brand h3 {
-  margin: 0;
-  font-size: 1.1em;
-}
-
-.sidebar-footer {
-  margin-top: 2em;
-  padding-top: 1em;
-  border-top: 1px solid var(--muted);
-  opacity: 0.8;
-}
-
-.theme-btn {
-  width: 100%;
-  padding: 0.6em;
-  background: transparent;
-  border: 1px solid var(--muted);
-  color: var(--text);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.theme-btn:hover {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
-
-/* ================== 移动端 TOC 交互 ================== */
-.toc-toggle {
-  position: fixed;
-  top: 1em;
-  left: 1em;
-  z-index: 1100;
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid rgba(0,0,0,0.1);
-  padding: 0.4em 0.8em;
-  border-radius: 20px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.4em;
-}
-
+/* 移动端 TOC */
+.toc-toggle { position: fixed; top: 1em; left: 1em; z-index: 1100; background: var(--bg); color: var(--text); border: 1px solid rgba(0,0,0,0.1); padding: 0.4em 0.8em; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); font-weight: 600; display: flex; align-items: center; gap: 0.4em; }
 .toc-toggle.hidden { display: none !important; }
-
-.toc-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(2px);
-  opacity: 0;
-  visibility: hidden;
-  transition: 0.3s;
-  z-index: 900;
-}
-
+.toc-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); opacity: 0; visibility: hidden; transition: 0.3s; z-index: 900; }
 .toc-overlay.show { opacity: 1; visibility: visible; }
 
-/* ================== 响应式适配 (移动端优先逻辑) ================== */
-
-/* 1. 手机端适配 */
+/* ================== 响应式 ================== */
 @media (max-width: 899px) {
-  .content {
-    /* 核心修改：减小内边距，让手机每行多显示几个字 */
-    /* 把原来的 2em 改为 1em，增加中间的正文宽度 */
-    padding: 1.5em 1em; 
-    
-    /* 再次确认防溢出 */
-    width: 100%;
-    overflow-x: hidden; 
-  }
-  
-  main.content h2 {
-    font-size: 1.6em;
-    margin-top: 40px;
-  }
+  .content { padding: 1.5em 1em; }
+  main.content h2 { font-size: 1.6em; margin-top: 40px; }
 }
 
-/* 2. 桌面端适配 */
 @media (min-width: 900px) {
   .sidebar { transform: none; }
   .toc-toggle { display: none; }
-  
-  .content {
-    margin-left: 280px; /* 留出侧边栏位置 */
-    padding: 3em 4em;   /* 桌面端保持宽敞 */
-  }
+  .content { margin-left: 280px; padding: 3em 4em; }
 }
 
-/* 3. 超宽屏适配 */
 @media (min-width: 1400px) {
-  .content {
-    padding: 4em 6em;
-    max-width: 1400px;
-  }
+  .content { padding: 4em 6em; max-width: 1400px; }
 }

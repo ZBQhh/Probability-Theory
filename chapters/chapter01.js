@@ -23,7 +23,7 @@ chapter('随机事件和概率')
         <li>若$A\\subset B$,则称$B$包含事件$A$或$A$含于$B$.若事件$A$发生,则事件$B$必然发生.若$A \\subset B$,且 $B \\subset A$,即$A =B$,则称事件$A$与事件$B$相等.</li>
         <li>事件$A\\cup B=\\lbrace\\omega\\in\\Omega:\\omega\\in A\\lor\\omega\\in B\\rbrace$称为事件$A$与$B$的并事件.$A \\cup B$发生当且仅当$A$发生或$B$发生.</li>
         <li>事件$A\\cap B=\\lbrace\\omega\\in\\Omega:\\omega\\in A\\land\\omega\\in B\\rbrace$称为事件$A$与$B$的交事件.$A \\cap B$发生当且仅当$A$和$B$同时发生.</li>
-        <li>事件$A-B=\\lbrace\\omega\\in\\Omega:\\omega\\in A\\land\\omega\\notin B\\rbrace$称为事件$A$与$B$的差事件.$A-B$发生当且仅当$A$发生而$B$不发生.</li>
+        <li>事件$$A-B=\\lbrace\\omega\\in\\Omega:\\omega\\in A\\land\\omega\\notin B\\rbrace$$称为事件$A$与$B$的差事件.$A-B$发生当且仅当$A$发生而$B$不发生.</li>
         <li>若$A \\cap B=\\varnothing$,则称事件$A$与$B$互不相容或互斥,即两事件不能同时发生.</li>
         <li>若$A \\cup B=\\Omega$,且$A \\cap B=\\varnothing$,则称两事件互为逆事件.并记为$A=\\overline{B}$或$B=\\overline{A}$.</li>
       </ol>
@@ -44,7 +44,7 @@ chapter('随机事件和概率')
     .theorem('频率的性质', `
       性质1.2.1 对于任何一个事件A,有$0\\leq f_n(A)\\leq 1$.<br>
       性质1.2.2 $f_n(\\Omega)=1$,$f_n(\\varnothing)=0$.<br>
-      性质1.2.3 $f_n(A\\cup B)=f_n(A)+f_n(B)-f_n(AB)$.<br>
+      性质1.2.3 $$f_n(A\\cup B)=f_n(A)+f_n(B)-f_n(AB)$$.<br>
       性质1.2.4 $f_n(\\overline{A})=1-f_n(A)$.<br>
       性质1.2.5 若$A\\subset B$,则有$f_n(A)\\leq f_n(B)$,且$f_n(B-A)=f_n(B)-f_n(A)$.
     `)
@@ -72,7 +72,7 @@ chapter('随机事件和概率')
     `)
     .example('例1.2.1 概率计算', `
       已知$P(A)=0.6$,$P(B)=0.7$,$P(A\\cup B)=0.8$,求$P(B-A)$与$P(A-B)$.<br>
-      解:$P(AB)=P(A)+P(B)-P(A\\cup B)=0.6+0.7-0.8=0.5$,<br>
+      解:$$P(AB)=P(A)+P(B)-P(A\\cup B)=0.6+0.7-0.8=0.5$$,<br>
       $P(B-A)=P(B)-P(AB)=0.7-0.5=0.2$,<br>
       $P(A-B)=P(A)-P(AB)=0.6-0.5=0.1$.
     `)
