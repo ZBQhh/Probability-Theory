@@ -1,52 +1,57 @@
 /* ==========================================================================
    FILE: assets/css/variables.css
-   描述: 全局变量定义与主题配置
+   描述: 全局变量定义 (修复深色模式对比度)
    ========================================================================== */
 :root {
-  --bg: #f7f8fa;
-  --text: #1c1c1c;
-  --muted: #888;
-  --accent: #4a90e2;
-  --block-radius: 14px;
-  --shadow: rgba(0,0,0,0.06);
+  /* --- 页面基础 --- */
+  --bg: #f7f9fc;             /* 浅色背景 */
+  --text: #1f2937;           /* 深色文字 */
+  --muted: #6b7280;          /* 灰色辅助文字 */
+  --accent: #3b82f6;         /* 强调色 (蓝) */
+  --shadow: rgba(0,0,0,0.06);/* 阴影 */
+  
+  /* --- 关键修复：环境块背景 --- */
+  /* 浅色模式下，背景偏白，半透明 */
+  --block-bg: rgba(255, 255, 255, 0.9);
+  --block-radius: 8px;
 
-  --c-theorem: #5A9BF0;
-  --c-definition: #61d4a0;
-  --c-lemma: #7937da;
-  --c-corollary: #FFCF80;
-  --c-example: #FF7B88;
-  --c-exercise: #FFB980;
-  --c-solution: #7FCFED;
-  --c-note: #ba74f7;
+  /* --- 环境标题颜色 (非标签) --- */
+  --env-title-color: #111827; 
 
-  --toc-bg: #ffffff;
-  --toc-text: #1c1c1c;
-  --toc-dot: #2b6cb0;
-  --toc-link: #1a202c;
-  --toc-link-hover: #2b6cb0;
-  --toc-indent: 12px;
+  /* --- 目录样式 --- */
+  --toc-text: #374151;
+  --toc-hover: rgba(0,0,0,0.05);
+  --toc-active-bg: #e0f2fe;
 }
 
-/* 暗色模式 */
+/* ==================== 暗色模式 (Dark Mode) ==================== */
 html.theme-dark {
-  --bg: #1e1e2f;
-  --text: #e0e0e0;
-  --muted: #999;
-  --c-theorem: #5A9BF0;
-  --c-definition: #5FC796;
-  --c-lemma: #A888D5;
-  --c-corollary: #FFB975;
-  --c-example: #FF7580;
-  --c-exercise: #FF9D60;
-  --c-solution: #5AB8E0;
-  --c-note: #B890E8;
+  /* --- 页面基础 --- */
+  --bg: #0f172a;             /* 深蓝黑背景 */
+  --text: #e2e8f0;           /* 浅灰白文字 */
+  --muted: #94a3b8;
+  --accent: #60a5fa;         /* 浅蓝色 */
+  --shadow: rgba(0,0,0,0.2);
+  
+  /* --- 关键修复：环境块背景 --- */
+  /* 深色模式下，背景要深，且有一点透明度以便区分层级 */
+  --block-bg: rgba(30, 41, 59, 0.7);
 
-  --toc-bg: #2a2a3c;
-  --toc-text: #e0e0e0;
-  --toc-dot: #7FB3FF;
-  --toc-link: #e0e0e0;
-  --toc-link-hover: #9FD0FF;
+  /* --- 环境标题颜色 --- */
+  --env-title-color: #f8fafc; /* 纯白，保证在深底上清晰 */
+
+  /* --- 目录样式 --- */
+  --toc-text: #cbd5e1;
+  --toc-hover: rgba(255,255,255,0.05);
+  --toc-active-bg: rgba(56, 189, 248, 0.15);
 }
 
-html.theme-dark code { background: rgba(255,255,255,0.1); }
-html.theme-dark pre { background: rgba(255,255,255,0.05); }
+/* 打印模式强制覆盖 */
+@media print {
+  :root, html.theme-dark {
+    --bg: #ffffff !important;
+    --text: #000000 !important;
+    --block-bg: transparent !important;
+    --env-title-color: #000000 !important;
+  }
+}

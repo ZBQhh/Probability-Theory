@@ -1,143 +1,285 @@
 /* ==========================================================================
    FILE: assets/js/search.js
-   描述: 基于 Fuse.js 的客户端全文模糊搜索
+   描述: 客户端全文模糊搜索 (基于 DOM 索引 + Fuse.js)
+   依赖: Fuse.js (需在 index.html 引入), components.css
    ========================================================================== */
 MathBook.search = {
   fuse: null,
   indexData: [],
+  isOpen: false,
 
-  init() {
-    this.buildIndex();
-    this.injectUI();
-    this.bindEvents();
-  },
-
-  // 1. 从 MathBook.state.chapters 构建索引数据
-  buildIndex() {
-    // 扁平化数据：将每一章的每一个 section/definition/theorem 拆分为独立的可搜索项
-    const rawData = MathBook.state.chapters;
-    this.indexData = [];
-
-    rawData.forEach(chap => {
-      // 索引章节标题
-      this.indexData.push({
-        id: `chap-${chap.num}`,
-        title: `第 ${chap.num} 章 ${chap.title}`,
-        text: chap.title,
-        type: '章节'
-      });
-
-      // 简单解析 HTML 字符串，提取纯文本用于搜索
-      // 注意：这只是一个简化的解析，实际生产环境可能需要更强的 HTML 清洗
-      const parser = new DOMParser();
-      
-      // 遍历该章所有内容块（这里需要修改 chapterAPI 配合存储结构化数据，
-      // 但为了不伤筋动骨，我们这里演示一种“运行时抓取”策略）
-    });
-    
-    // 由于目前的架构 content 是 HTML 字符串数组，我们换一种策略：
-    // 在 renderer 渲染完 DOM 后，直接抓取 DOM 文本建立索引！
-    // 这种方式最准确，所见即所得。
-  },
-  
-  // 修正：我们改用“DOM 就绪后抓取策略”
-  buildIndexFromDOM() {
-    const blocks = document.querySelectorAll('.block, h2, h3');
-    this.indexData = [];
-
-    blocks.forEach(el => {
-      // 忽略公式内的文本，避免搜索 LaTeX 代码
-      const clone = el.cloneNode(true);
-      clone.querySelectorAll('.formula, .formula-wrapper').forEach(e => e.remove());
-      
-      const text = clone.textContent.replace(/\s+/g, ' ').trim();
-      if (text.length < 2) return;
-
-      this.indexData.push({
-        id: el.id || '',
-        title: el.querySelector('.env-title')?.textContent || text.substring(0, 20) + '...',
-        text: text,
-        type: el.dataset.envtype ? MathBook.utils.getEnvName(el.dataset.envtype) : '正文'
-      });
-    });
-
-    // 初始化 Fuse
-    if (window.Fuse) {
-      this.fuse = new Fuse(this.indexData, {
-        keys: ['text', 'title'],
-        threshold: 0.3, // 模糊阈值
-        ignoreLocation: true
-      });
+  // 配置项
+  config: {
+    fuseOptions: {
+      keys: [
+        { name: 'title', weight: 0.7 },  // 标题权重高
+        { name: 'text', weight: 0.3 },   // 正文权重低
+        { name: 'type', weight: 0.5 }    // 类型名称
+      ],
+      threshold: 0.3, // 模糊阈值 (0.0=精确匹配, 1.0=任意匹配)
+      ignoreLocation: true,
+      minMatchCharLength: 2
     }
   },
 
-  injectUI() {
-    // 插入搜索按钮和模态框
-    const btn = `<button class="search-toggle" aria-label="搜索" onclick="MathBook.search.open()">🔍</button>`;
-    document.querySelector('.sidebar').insertAdjacentHTML('beforeend', btn);
-
-    const modal = `
-      <div class="search-overlay" id="searchModal" onclick="MathBook.search.close(event)" style="display:none;">
-        <div class="search-box">
-          <input type="text" id="searchInput" placeholder="搜索定义、定理、内容..." autocomplete="off">
-          <ul id="searchResults"></ul>
-        </div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modal);
-  },
-
-  search(query) {
-    if (!this.fuse || !query) return;
-    const results = this.fuse.search(query);
-    const ul = document.getElementById('searchResults');
-    ul.innerHTML = '';
-
-    if (results.length === 0) {
-      ul.innerHTML = '<li class="no-result">无相关结果</li>';
+  /**
+   * 初始化入口
+   * 应在 MathBook.renderer.renderChapters() 之后调用
+   */
+  init() {
+    // 1. 检查依赖
+    if (typeof Fuse === 'undefined') {
+      console.warn('[MathBook] Fuse.js not loaded. Search disabled.');
       return;
     }
 
+    // 2. 注入 UI (模态框)
+    this.injectUI();
+
+    // 3. 建立索引 (延时执行，确保 DOM 已完全渲染)
+    setTimeout(() => {
+      this.buildIndexFromDOM();
+      console.log(`[MathBook] Search index built: ${this.indexData.length} items.`);
+    }, 500);
+
+    // 4. 绑定事件
+    this.bindEvents();
+  },
+
+  /**
+   * 核心：从页面 DOM 抓取可搜索内容
+   * 策略：遍历 H2, H3, 和 .block (数学环境)
+   */
+  buildIndexFromDOM() {
+    this.indexData = [];
+    const container = document.querySelector('main.content');
+    if (!container) return;
+
+    // A. 索引章节标题 (H2)
+    container.querySelectorAll('h2').forEach(el => {
+      this.addToIndex(el, '章节', el.textContent, 10);
+    });
+
+    // B. 索引小节标题 (H3)
+    container.querySelectorAll('h3').forEach(el => {
+      this.addToIndex(el, '小节', el.textContent, 8);
+    });
+
+    // C. 索引数学环境 (.block)
+    container.querySelectorAll('.block').forEach(el => {
+      // 1. 获取 ID
+      const id = el.id;
+      if (!id) return;
+
+      // 2. 获取类型名称 (从 CSS类名 或 config 获取)
+      // 提取类名中的 type-xxx
+      const typeClass = Array.from(el.classList).find(c => c.startsWith('type-'));
+      const typeKey = typeClass ? typeClass.replace('type-', '') : 'default';
+      const typeName = MathBook.utils.getEnvName(typeKey); // 使用 config.js 中的中文名
+
+      // 3. 获取标题 (env-title) 和 编号 (env-num)
+      const titleEl = el.querySelector('.env-title');
+      const numEl = el.querySelector('.env-num');
+      const titleText = titleEl ? titleEl.textContent : '';
+      const numText = numEl ? numEl.textContent : '';
+      
+      const displayTitle = `${typeName} ${numText} ${titleText}`.trim();
+
+      // 4. 获取正文 (移除标题部分，避免重复)
+      const bodyEl = el.querySelector('.env-body');
+      let bodyText = bodyEl ? bodyEl.textContent : el.textContent;
+      
+      // 清理文本: 移除多余空格、换行、LaTeX 符号的大致清理
+      bodyText = bodyText.replace(/\s+/g, ' ').trim();
+
+      this.addToIndex(el, typeName, displayTitle, 5, bodyText);
+    });
+  },
+
+  /**
+   * 辅助：添加单条索引
+   */
+  addToIndex(el, type, title, priority, text = "") {
+    if (!el.id) return; // 无锚点无法跳转
+    
+    this.indexData.push({
+      id: el.id,
+      type: type,
+      title: title,
+      text: text || title, // 如果没有正文，用标题填充
+      priority: priority
+    });
+  },
+
+  /**
+   * 初始化 Fuse 实例
+   */
+  initFuse() {
+    if (this.indexData.length > 0 && !this.fuse) {
+      this.fuse = new Fuse(this.indexData, this.config.fuseOptions);
+    }
+  },
+
+  /**
+   * 动态注入 HTML 结构
+   * 对应 components.css 中的 .search-toggle, .search-overlay 等
+   */
+  injectUI() {
+    // 1. 在侧边栏插入搜索按钮 (如果尚未存在)
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar && !document.querySelector('.search-toggle')) {
+      const btn = document.createElement('button');
+      btn.className = 'search-toggle';
+      btn.innerHTML = '🔍 搜索内容 (Ctrl+K)';
+      btn.onclick = () => this.open();
+      // 插入到侧边栏顶部品牌下方
+      const brand = sidebar.querySelector('.brand');
+      if (brand) brand.insertAdjacentElement('afterend', btn);
+    }
+
+    // 2. 插入全屏搜索模态框
+    if (!document.getElementById('searchModal')) {
+      const modalHtml = `
+        <div class="search-overlay" id="searchModal">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索定理、定义、内容..." autocomplete="off">
+            <ul id="searchResults"></ul>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+  },
+
+  /**
+   * 执行搜索
+   */
+  performSearch(query) {
+    // 懒加载 Fuse
+    if (!this.fuse) this.initFuse();
+
+    const ul = document.getElementById('searchResults');
+    ul.innerHTML = '';
+
+    if (!query || query.trim().length === 0) {
+      return;
+    }
+
+    const results = this.fuse.search(query);
+
+    if (results.length === 0) {
+      ul.innerHTML = '<li style="padding:1em; color:#888; text-align:center;">未找到相关内容</li>';
+      return;
+    }
+
+    // 仅显示前 10 条结果
     results.slice(0, 10).forEach(res => {
       const item = res.item;
       const li = document.createElement('li');
+      
+      // 构建列表项 (对应 components.css 中的样式)
       li.innerHTML = `
-        <a href="#${item.id}" onclick="MathBook.search.closeAndJump()">
+        <a href="#${item.id}" data-id="${item.id}">
           <span class="res-tag">${item.type}</span>
-          <span class="res-text">${item.title}</span>
+          <span class="res-text">
+            <strong>${item.title}</strong>
+            <span style="font-size:0.85em; color:#999; margin-left:0.5em;">
+              ${item.text.substring(0, 30)}...
+            </span>
+          </span>
         </a>
       `;
+      
+      // 点击事件处理
+      li.querySelector('a').addEventListener('click', (e) => {
+        e.preventDefault();
+        this.close();
+        this.jumpTo(item.id);
+      });
+
       ul.appendChild(li);
     });
   },
 
+  /**
+   * 跳转逻辑
+   */
+  jumpTo(id) {
+    const target = document.getElementById(id);
+    if (target) {
+      // 1. 滚动
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // 2. 高亮动画 (复用 base.css 中的 .highlight-flash)
+      target.classList.remove('highlight-flash');
+      void target.offsetWidth; // 触发重绘
+      target.classList.add('highlight-flash');
+      
+      // 3. 更新 URL hash
+      history.pushState(null, null, `#${id}`);
+    }
+  },
+
+  /**
+   * 打开搜索框
+   */
   open() {
-    // 每次打开时重新构建索引（以防动态加载）
-    if(!this.fuse) this.buildIndexFromDOM();
-    document.getElementById('searchModal').style.display = 'flex';
-    document.getElementById('searchInput').focus();
+    this.isOpen = true;
+    const modal = document.getElementById('searchModal');
+    const input = document.getElementById('searchInput');
+    modal.style.display = 'flex'; // 对应 CSS flex 布局
+    input.value = '';
+    document.getElementById('searchResults').innerHTML = '';
+    
+    // 延时聚焦，防止移动端键盘弹起卡顿
+    setTimeout(() => input.focus(), 50);
+    
+    // 禁止背景滚动
+    document.body.style.overflow = 'hidden';
   },
 
-  close(e) {
-    if (e && e.target.className !== 'search-overlay') return;
+  /**
+   * 关闭搜索框
+   */
+  close() {
+    this.isOpen = false;
     document.getElementById('searchModal').style.display = 'none';
+    document.body.style.overflow = ''; // 恢复滚动
   },
 
-  closeAndJump() {
-    document.getElementById('searchModal').style.display = 'none';
-  },
-
+  /**
+   * 事件绑定
+   */
   bindEvents() {
-    document.getElementById('searchInput')?.addEventListener('input', (e) => {
-      this.search(e.target.value);
+    const modal = document.getElementById('searchModal');
+    const input = document.getElementById('searchInput');
+
+    // 1. 输入监听 (防抖 200ms)
+    let debounceTimer;
+    input.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        this.performSearch(e.target.value);
+      }, 200);
     });
-    // 键盘快捷键 Ctrl+K
+
+    // 2. 点击遮罩层关闭
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) this.close();
+    });
+
+    // 3. 全局键盘事件
     document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      // Ctrl+K 唤起
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
-        this.open();
+        this.isOpen ? this.close() : this.open();
       }
-      if (e.key === 'Escape') this.close({target: {className: 'search-overlay'}});
+      
+      // Esc 关闭
+      if (e.key === 'Escape' && this.isOpen) {
+        this.close();
+      }
     });
   }
 };

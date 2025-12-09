@@ -1,222 +1,183 @@
 /* ==========================================================================
-   FILE: assets/css/c
-   描述: UI 组件（环境块、目录列表、公式块等）
+   FILE: assets/css/components.css
+   描述: UI 组件 (优雅的悬浮链接版)
    ========================================================================== */
-/* 环境块通用样式 */
+
+/* ================== 1. 环境块与 Permalink ================== */
 .block {
   position: relative;
-  margin: 2em 0;
-  padding: 1.5em 2em;
+  margin: 1.8em 0;
+  padding: 1.2em 1.5em;
   border-radius: var(--block-radius);
-  box-shadow: 0 4px 20px var(--shadow);
-  background: var(--bg);
-  font-family: "Arial", "Noto Serif SC", serif;
+  box-shadow: 0 4px 15px var(--shadow);
+  transition: box-shadow 0.3s ease;
+  font-family: "Arial", "Noto Serif SC", sans-serif;
+  
+  /* 确保 permalink 绝对定位以此为基准 */
+  overflow: hidden; 
 }
 
-.block::before {
-  content: "";
-  position: absolute;
-  left: -0.6em;
-  top: 1.5em;
-  width: 8px;
-  height: 1.5em;
-  border-radius: 4px;
-  background: var(--color, var(--accent));
-}
-
+/* 标题区域 */
 .env-heading {
-  font-weight: 500;
-  margin-bottom: 0.6em;
-  display: flex;
-  align-items: baseline;
-  gap: 0.5em;
-  flex-wrap: wrap;
-  font-family: "Arial", "Source Han Sans SC";
-}
-
-.env-label { font-weight: 600; color: var(--color, var(--accent)); }
-.env-num { font-weight: 600; color: var(--color, var(--accent)); }
-.env-title { font-weight: 500; color: var(--text); margin-left: 0.75em !important; }
-.env-body { margin-top: 0.6em; }
-
-/* 环境类型定义 */
-.type-theorem { --color: var(--c-theorem); font-family: "Arial", "Source Han Sans SC", serif; }
-.type-lemma { --color: var(--c-lemma); font-family: "Arial", "Source Han Sans SC", serif; font-style: italic; }
-.type-corollary { --color: var(--c-corollary); font-family: "Arial", "Source Han Sans SC", serif; font-style: italic; }
-.type-example { --color: var(--c-example); font-family: "Arial", "Source Han Sans SC"; font-weight: 400; }
-.type-exercise { --color: var(--c-exercise); font-family: "Arial", "Source Han Sans SC"; }
-.type-solution { --color: var(--c-solution); font-family: "Arial", "Noto Serif SC", serif; }
-.type-definition { --color: var(--c-definition); font-family: "Source Han Sans SC", "思源黑体", sans-serif; font-weight: 500; }
-.type-note { --color: var(--c-note); font-family: "Source Han Sans SC", "思源黑体", sans-serif; font-weight: 400; }
-
-/* 侧边栏 TOC 列表 */
-.toc { list-style: none; padding-left: 0; margin: 0; }
-.toc li { margin: 6px 0; padding: 0 0.4em; }
-
-.toc li a {
-  color: var(--toc-text);
-  text-decoration: none;
-  display: block;
-  padding: 0.25em 0;
-  border-radius: 6px;
-  font-size: 0.98em;
-}
-
-.toc li a:hover { color: var(--toc-link-hover); background: rgba(0,0,0,0.03); }
-.toc li a.active { font-weight: 600; color: var(--accent); background: rgba(0,0,0,0.04); }
-
-.toc-h2 a { font-weight: 700; margin-top: 6px; padding-left: 0.2em; }
-.toc-h3 a { padding-left: 1.2em; font-size: 0.95em; opacity: 0.88; }
-
-.toc .collapse-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  user-select: none;
-  padding: 0.2em 0.2em;
-}
-
-.toc .collapse-toggle .caret {
-  width: 10px;
-  height: 10px;
-  display: inline-block;
-  border-right: 2px solid var(--muted);
-  border-bottom: 2px solid var(--muted);
-  transform: rotate(0deg);
-  margin-left: 6px;
-  transition: transform 0.18s ease;
-}
-
-.toc .collapsed > .collapse-toggle .caret { transform: rotate(90deg); }
-
-#tocList ul.toc-sub {
-  display: none;
-  padding-left: 1.2em;
-  margin: 0.2em 0;
-  transition: all 0.2s ease;
-}
-
-#tocList ul.toc-sub.open { display: block; }
-
-/* 公式编号与布局 */
-.formula-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  margin-bottom: 0.8em;
+  line-height: 1.5;
+  
+  /* 💥 核心修改：移除右侧强制留白 */
+  /* 让标题文字可以流向最右边，不再浪费手机屏幕空间 */
+  padding-right: 0; 
+  
+  position: relative;
   width: 100%;
-  gap: 1em;
 }
 
-.formula { flex: 1; text-align: center; }
-.equation-num { margin-left: auto; color: var(--muted); white-space: nowrap; font-size: 0.95em; }
-
-/* 彩色公式 */
-.color-formula { display: flex; align-items: flex-start; margin: 1.2em 0; gap: 0.8em; }
-.color-formula .formula-left-line { width: 4px; background: var(--fcolor); border-radius: 4px; flex-shrink: 0; }
-.color-formula .formula-core { flex: 1; }
-.color-formula .formula { font-size: 1.05em; margin-bottom: 0.3em; }
-.color-formula .formula-meta { font-size: 0.9em; color: #666; display: flex; gap: 0.6em; }
-.color-formula .equation-num { font-weight: bold; color: var(--fcolor); }
-.color-formula .equation-name { font-style: italic; }
-
-/* 公式盒子 */
-.block.type-formula-box {
-  --color: var(--box-color, #409EFF);
-  border-left: none;
-  padding-left: 1em;
-  margin: 1.6em 0;
-}
-
-.block.type-formula-box .env-heading {
-  padding-left: 0.6em;
-  margin-bottom: 0.5em;
-  border-left: none;
-  font-weight: 500;
-  font-family: "Source Han Sans SC", "Times New Roman";
-}
-
-.block.type-formula-box .env-label,
-.block.type-formula-box .env-num,
-.block.type-formula-box .env-title {
-  color: var(--color);
-  font-weight: 500;
-  font-family: "Source Han Sans SC", "Times New Roman";
-}
-/* ================== 深度链接锚点 (Deep Linking) ================== */
-/* 仅在鼠标悬停时显示 */
-.block:hover .permalink,
-.formula-wrapper:hover .permalink {
-  opacity: 1;
-}
-
+/* 💥 Permalink (复制链接 ¶) 智能悬浮版 */
 .permalink {
   position: absolute;
-  top: 1.5em; /* 与 block 标题对齐 */
-  right: 1em; /* 放在右侧 */
-  opacity: 0;
-  color: var(--muted);
+  /* 定位到右上角，稍微留点边距 */
+  top: 0.5em;
+  right: 0.5em;
+  
+  width: 2em;
+  height: 2em;
+  line-height: 2em;
+  text-align: center;
   font-size: 1.2em;
+  
+  color: var(--accent);
   text-decoration: none;
-  transition: opacity 0.2s, color 0.2s;
-  cursor: pointer;
-  z-index: 10;
-  font-family: Arial, sans-serif;
+  border-radius: 50%; /* 圆形按钮更现代 */
+  
+  /* 核心技巧：平时隐身且“穿透” */
+  opacity: 0;
+  pointer-events: none; /* 关键！隐藏时鼠标可以穿透它去复制下面的文字 */
+  transform: scale(0.8);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  z-index: 20; /* 保证在最上层 */
+
+  /* 优雅的遮盖背景：当它出现时，为了防止和底部文字重叠看不清，
+     给它加一个和环境块一样的背景色，形成“遮罩”效果 */
+  background-color: var(--block-bg); 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  backdrop-filter: blur(2px); /* 磨砂玻璃感 (可选) */
+}
+
+/* 交互逻辑 */
+
+/* 1. 鼠标悬停 (PC) */
+.block:hover .permalink {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto; /* 出现后，恢复可点击状态 */
+}
+
+/* 2. 触摸激活 (Mobile) */
+/* 在手机上，点击环境块时，链接浮现 */
+.block:active .permalink,
+.block:focus-within .permalink {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
 }
 
 .permalink:hover {
+  background-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb, 0,0,0), 0.3);
+}
+
+/* 公式环境内的 Permalink */
+.math-display-block {
+  position: relative;
+}
+/* 公式块悬停时显示 */
+.math-display-block:hover .permalink {
+  opacity: 1;
+  pointer-events: auto;
+}
+.math-display-block .permalink {
+  top: 0;
+  right: 0;
+  background-color: transparent; /* 公式块通常空白较多，不需要背景遮罩 */
+  box-shadow: none;
+}
+
+
+/* ================== 2. 目录 (TOC) 样式 (保持之前的逻辑) ================== */
+.toc { list-style: none; padding: 0; margin: 0; }
+
+.toc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2px 0;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.toc-row:hover { background: var(--toc-hover); }
+
+.toc-link {
+  flex: 1;
+  padding: 0.6em 0.5em;
+  color: var(--toc-text);
+  text-decoration: none;
+  font-size: 0.95em;
+  font-weight: 500;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.toc-link.active { color: var(--accent); font-weight: 700; }
+
+.toc-toggle-btn {
+  width: 34px; /* 稍微加大触控区域 */
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.8em;
+  transition: transform 0.3s ease;
+}
+.toc-toggle-btn:hover { color: var(--accent); }
+
+.toc-item-h2 .toc-sub {
+  display: block;
+  padding-left: 1.2em;
+  max-height: 1000px; 
+  overflow: hidden;
+  transition: max-height 0.4s ease-out, opacity 0.4s ease;
+  opacity: 1;
+}
+.toc-item-h2.collapsed .toc-sub {
+  max-height: 0;
+  opacity: 0;
+}
+.toc-item-h2.collapsed .toc-toggle-btn {
+  transform: rotate(-90deg);
+}
+
+.toc-item-h3 a {
+  display: block;
+  padding: 0.4em 0.5em 0.4em 1em;
+  color: var(--toc-text);
+  opacity: 0.85;
+  text-decoration: none;
+  font-size: 0.9em;
+  border-left: 2px solid transparent;
+}
+.toc-item-h3 a:hover { color: var(--accent); opacity: 1; }
+.toc-item-h3 a.active {
   color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--toc-active-bg);
+  opacity: 1;
 }
 
-/* 公式环境的锚点位置微调 */
-.formula-wrapper .permalink {
-  top: 50%;
-  transform: translateY(-50%);
-  right: -1.5em; /* 悬浮在公式右侧外 */
-}
-
-.block.type-formula-box .permalink {
-  top: 0.5em;
-  right: 0.5em;
-}
-
-/* 打印时不显示锚点 */
-@media print {
-  .permalink { display: none !important; }
-}
-/* 搜索组件样式 */
-.search-toggle {
-  margin-top: 1em; width: 100%; padding: 0.5em; border: 1px solid var(--muted);
-  background: transparent; color: var(--toc-text); border-radius: 6px; cursor: pointer;
-}
-.search-overlay {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5); z-index: 2000;
-  display: none; align-items: flex-start; justify-content: center; padding-top: 10vh;
-}
-.search-box {
-  width: 90%; max-width: 600px; background: var(--bg); border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden;
-  display: flex; flex-direction: column; max-height: 70vh;
-}
-#searchInput {
-  width: 100%; padding: 1.2em; border: none; font-size: 1.1em;
-  background: var(--bg); color: var(--text); border-bottom: 1px solid var(--muted);
-  outline: none;
-}
-#searchResults {
-  list-style: none; padding: 0; margin: 0; overflow-y: auto;
-}
-#searchResults li a {
-  display: flex; align-items: center; padding: 0.8em 1.2em;
-  text-decoration: none; color: var(--text); border-bottom: 1px solid rgba(0,0,0,0.05);
-  transition: background 0.1s;
-}
-#searchResults li a:hover { background: rgba(0,0,0,0.05); }
-.res-tag {
-  font-size: 0.75em; padding: 0.2em 0.5em; border-radius: 4px;
-  background: var(--accent); color: #fff; margin-right: 0.8em; flex-shrink: 0;
-}
-.res-text {
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
+/* ================== 3. 其他通用 ================== */
+.env-body { color: var(--text); }
+.search-box { background: var(--bg); border: 1px solid var(--muted); }
+#searchInput { background: transparent; color: var(--text); }
+.res-tag { color: #fff !important; }

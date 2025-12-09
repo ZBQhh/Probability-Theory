@@ -1,6 +1,6 @@
 /* ==========================================================================
    FILE: assets/js/renderer.js
-   描述: DOM 操作、交互式引用与 MathJax 渲染
+   描述: 渲染核心 (TreeWalker 高性能版 + MathJax 懒加载)
    ========================================================================== */
 MathBook.renderer = {
   container: null,
@@ -9,26 +9,42 @@ MathBook.renderer = {
     this.container = document.querySelector("main.content");
   },
 
+  /**
+   * 1. 将章节内容挂载到 DOM
+   * 使用 DocumentFragment 减少页面重排 (Reflow)
+   */
   renderChapters() {
     if (!this.container) return;
+
+    const fragment = document.createDocumentFragment();
+    
     MathBook.state.chapters.forEach(ch => {
       if (!ch._rendered) {
-        const fragment = document.createRange().createContextualFragment(ch.content.join(''));
-        this.container.appendChild(fragment);
+        // 创建章节容器
+        const chapterDiv = document.createElement('div');
+        chapterDiv.className = 'chapter-wrapper';
+        chapterDiv.innerHTML = ch.content.join('');
+        fragment.appendChild(chapterDiv);
         ch._rendered = true;
       }
     });
+
+    this.container.appendChild(fragment);
   },
 
+  /**
+   * 2. 生成标题序号 (1.1, 1.2...)
+   */
   generateHeadingNumbering() {
     if (!this.container) return;
-    this.container.querySelectorAll(".heading-number").forEach(el => el.remove());
 
     let h2Count = 0, h3Count = 0;
 
+    // 仅查询 main.content 下的标题
     this.container.querySelectorAll("h2, h3").forEach(heading => {
-      // 保持原有 ID 逻辑，如果 ChapterAPI 已经生成了 ID 则保留
-      // 这里的逻辑主要是为 h3 生成 ID，以及处理没有手动指定 ID 的情况
+      // 防止重复生成
+      if (heading.querySelector('.heading-number')) return;
+
       if (heading.tagName === "H2") {
         h2Count++;
         h3Count = 0;
@@ -38,11 +54,12 @@ MathBook.renderer = {
         heading.dataset.number = `${h2Count}.${h3Count}`;
       }
 
-      // 如果 API 没生成 ID，这里补一个
+      // 确保有 ID 用于跳转
       if (!heading.id) {
         heading.id = "sec-" + heading.dataset.number.replace(/\./g, "-");
       }
 
+      // 插入序号 span
       const span = document.createElement("span");
       span.className = "heading-number";
       span.textContent = heading.dataset.number + " ";
@@ -50,63 +67,151 @@ MathBook.renderer = {
     });
   },
 
-  updateRefsAndMathJax() {
-    if (!this.container) return Promise.resolve();
-    
-    const map = MathBook.state.formulaMap;
-    
-    // 正则替换 \ref{key} 为 <a href="#id">number</a>
-    // 使用 HTML 字符串处理虽然粗暴，但对于数学公式混合文本最有效
-    const htmlContent = this.container.innerHTML;
-    
-    const newHtml = htmlContent.replace(/\\ref\{(.+?)\}/g, (match, key) => {
-      const entry = map[key];
-      if (entry) {
-        // entry 结构: { number: "1.2", id: "thm-1-2", type: "theorem" }
-        // 如果是 string (旧数据兼容)，则 fallback
-        const num = typeof entry === 'object' ? entry.number : entry;
-        const id = typeof entry === 'object' ? entry.id : null;
-        
-        if (id) {
-          return `<a href="#${id}" class="ref-link" title="跳转至 ${num}">(${num})</a>`;
-        } else {
-          return `(${num})`;
-        }
-      }
-      console.warn(`[MathBook] Reference not found: ${key}`);
-      return `<span style="color:red; font-weight:bold">??</span>`;
-    });
+  /**
+   * 3. 核心：更新引用并触发 MathJax
+   * 使用 TreeWalker 进行精准文本替换，性能最优
+   */
+  async updateRefsAndMathJax() {
+    if (!this.container) return;
 
-    this.container.innerHTML = newHtml;
+    // A. 解析 \ref{...}
+    this.processReferences(this.container);
 
-    // 重新绑定平滑滚动 (因为 innerHTML 重写破坏了原有事件)
+    // B. 绑定平滑滚动
     this.bindSmoothScroll();
 
-    // 触发 MathJax 渲染
-    if (window.MathJax && window.MathJax.typesetPromise) {
-      return window.MathJax.typesetPromise();
+    // C. 触发 MathJax 渲染 (Lazy 模式)
+    if (window.MathJax) {
+      // 等待 MathJax 核心加载完毕
+      await window.MathJax.startup.promise;
+      
+      // 如果启用了 lazy 扩展，调用 typeset 会初始化观察器
+      if (window.MathJax.typeset) {
+        window.MathJax.typeset([this.container]);
+      } else if (window.MathJax.typesetPromise) {
+        // 降级兼容
+        await window.MathJax.typesetPromise([this.container]);
+      }
     }
-    return Promise.resolve();
   },
 
-  // 内部辅助：为动态生成的 .ref-link 添加平滑滚动
+  /**
+   * [Helper] 使用 TreeWalker 替换文本节点中的引用
+   */
+  processReferences(rootNode) {
+    const map = MathBook.state.formulaMap;
+    // 正则：匹配 \ref{任意字符}
+    const refRegex = /\\ref\{([^}]+)\}/g;
+
+    // 创建 TreeWalker，只看文本节点 (SHOW_TEXT)
+    const walker = document.createTreeWalker(
+      rootNode,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: function(node) {
+          // 优化：只有包含 \ref 的文本节点才处理
+          return node.nodeValue.includes('\\ref{') 
+            ? NodeFilter.FILTER_ACCEPT 
+            : NodeFilter.FILTER_SKIP;
+        }
+      }
+    );
+
+    const nodesToReplace = [];
+    
+    // 1. 收集阶段 (不能边遍历边修改，会打乱 walker)
+    while (walker.nextNode()) {
+      nodesToReplace.push(walker.currentNode);
+    }
+
+    // 2. 替换阶段
+    nodesToReplace.forEach(textNode => {
+      const text = textNode.nodeValue;
+      let match;
+      let lastIndex = 0;
+      const fragment = document.createDocumentFragment();
+      let hasMatch = false;
+
+      // 重置正则索引
+      refRegex.lastIndex = 0;
+
+      while ((match = refRegex.exec(text)) !== null) {
+        hasMatch = true;
+        
+        // A. 添加匹配前的纯文本
+        if (match.index > lastIndex) {
+          fragment.appendChild(
+            document.createTextNode(text.substring(lastIndex, match.index))
+          );
+        }
+
+        // B. 创建链接元素
+        const key = match[1]; // 获取 \ref{key} 中的 key
+        const entry = map[key];
+        
+        if (entry) {
+          const num = entry.number || entry; // 兼容旧数据
+          const id = entry.id;
+          
+          if (id) {
+            const a = document.createElement('a');
+            a.href = `#${id}`;
+            a.className = 'ref-link';
+            a.title = `跳转至 ${num}`;
+            a.textContent = `(${num})`;
+            fragment.appendChild(a);
+          } else {
+            fragment.appendChild(document.createTextNode(`(${num})`));
+          }
+        } else {
+          // 未找到引用，显示红色的 ??
+          const span = document.createElement('span');
+          span.style.color = 'red';
+          span.style.fontWeight = 'bold';
+          span.textContent = '??';
+          fragment.appendChild(span);
+          console.warn(`[Ref] Missing reference: ${key}`);
+        }
+
+        lastIndex = refRegex.lastIndex;
+      }
+
+      // C. 添加剩余文本
+      if (hasMatch) {
+        if (lastIndex < text.length) {
+          fragment.appendChild(
+            document.createTextNode(text.substring(lastIndex))
+          );
+        }
+        // 执行 DOM 替换
+        textNode.parentNode.replaceChild(fragment, textNode);
+      }
+    });
+  },
+
+  /**
+   * [Helper] 绑定平滑滚动效果
+   */
   bindSmoothScroll() {
-    const links = this.container.querySelectorAll('a.ref-link');
-    links.forEach(link => {
-      link.addEventListener('click', (e) => {
+    // 这里使用事件委托，性能更好
+    this.container.addEventListener('click', (e) => {
+      const link = e.target.closest('a.ref-link');
+      if (link) {
         const href = link.getAttribute('href');
-        if (href.startsWith('#')) {
+        if (href && href.startsWith('#')) {
           e.preventDefault();
-          const target = document.getElementById(href.substring(1));
+          const targetId = href.substring(1);
+          const target = document.getElementById(targetId);
           if (target) {
-            // 添加高亮动画效果
+            // 添加高亮闪烁动画
+            target.classList.remove('highlight-flash');
+            void target.offsetWidth; // 触发重绘
             target.classList.add('highlight-flash');
-            setTimeout(() => target.classList.remove('highlight-flash'), 2000);
             
             target.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         }
-      });
+      }
     });
   }
 };
