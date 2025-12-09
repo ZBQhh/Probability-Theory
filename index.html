@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+  <!-- ==================== 防止缓存 (开发期间使用) ==================== -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="基于 HTML5 与 MathJax 的现代化在线数学笔记/书籍模板，支持离线阅读与全文搜索">
+  <meta name="theme-color" content="#ffffff">
+  
+  <!-- ==================== 性能优化 (Preconnect) ==================== -->
+  <!-- 提前建立 CDN 连接，加速 MathJax 和 Fuse.js 加载 -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <!-- ==================== 社交分享优化 (Open Graph) ==================== -->
+  <meta property="og:title" content="概率论与数理统计">
+  <meta property="og:description" content="基于 MathBook 的现代化数学笔记，支持全文搜索、离线阅读与 LaTeX 排版。">
+  <meta property="og:type" content="book">
+
+  <title>概率论与数理统计</title>
+
+  <!-- ==================== 样式表 (CSS 架构入口) ==================== -->
+  <!-- 添加版本号防止缓存，每次修改CSS后更新v参数 -->
+  <link rel="stylesheet" href="assets/css/style.css?v=1.0.0">
+
+  <!-- ==================== JavaScript 模块加载 ==================== -->
+  
+  <!-- 0. 主题管理 (立即执行，防止夜间模式闪烁) -->
+  <script src="assets/js/theme.js?v=1.0.0"></script>
+
+  <!-- 1. 基础配置 (Defer) -->
+  <script src="assets/js/config.js?v=1.0.0" defer></script>
+  
+  <!-- 2. 第三方依赖库 (Defer) -->
+  <!-- 搜索核心库 -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js" defer></script>
+  <!-- MathJax 配置 -->
+  <script src="assets/js/mathJaxConfig.js?v=1.0.0" defer></script>
+  <!-- MathJax 核心库 -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+
+  <!-- 3. 核心 API 与组件 (Defer) -->
+  <script src="assets/js/chapterAPI.js?v=1.0.0" defer></script>
+  <script src="assets/js/renderer.js?v=1.0.0" defer></script>
+  <script src="assets/js/toc.js?v=1.0.0" defer></script>
+  <script src="assets/js/search.js?v=1.0.0" defer></script> <!-- 必须在 fuse.js 之后加载 -->
+
+  <!-- 4. 章节内容数据 (在此处按顺序引入章节) -->
+  <script src="chapters/chapter01.js?v=1.0.0" defer></script>
+  <script src="chapters/chapter02.js?v=1.0.0" defer></script>
+
+  <!-- 5. 初始化入口 (Defer, 编排整个流程，必须最后加载) -->
+  <script src="assets/js/init.js?v=1.0.0" defer></script>
+</head>
+
+<body>
+  <!-- ==================== 辅助功能区 ==================== -->
+  <button class="toc-toggle" aria-label="打开目录" aria-controls="tocList" aria-expanded="false">
+    <span aria-hidden="true">☰</span> 目录
+  </button>
+  
+  <!-- 目录遮罩层 -->
+  <div class="toc-overlay" aria-hidden="true"></div>
+
+  <!-- ==================== 侧边栏导航 ==================== -->
+  <aside class="sidebar" aria-label="站点导航">
+    <header class="brand">
+      <div class="logo" aria-hidden="true">Zbq</div>
+      <h3>MathNotes</h3>
+    </header>
+    
+    <!-- 章节目录容器 -->
+    <nav aria-label="章节目录">
+      <ul class="toc" id="tocList">
+        <!-- 目录将由 toc.js 自动生成 -->
+      </ul>
+    </nav>
+
+    <!-- 侧边栏底部工具栏 -->
+    <div class="sidebar-footer">
+      <button onclick="toggleTheme()" aria-label="切换深色/浅色主题" class="theme-btn">
+        切换主题
+      </button>
+      <!-- 搜索按钮已由 search.js 自动插入到此处附近 -->
+    </div>
+  </aside>
+
+  <!-- ==================== 主内容区 ==================== -->
+  <main class="content" role="main" id="main-content">
+    <h1 class="book-title">概率论与数理统计</h1>
+    
+    <!-- 加载提示 (JS 初始化后会被移除或覆盖) -->
+    <noscript>
+      <div style="padding: 2em; color: #d73a49;">
+        请启用 JavaScript 以阅读本书籍。
+      </div>
+    </noscript>
+    
+    <!-- 章节内容将由 renderer.js 自动注入到此处 -->
+  </main>
+
+  <!-- ==================== PWA 离线支持 ==================== -->
+  <!-- 开发期间建议注释掉，上线时再启用 -->
+  <!--
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('ServiceWorker registered with scope:', registration.scope);
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed:', err);
+          });
+      });
+    }
+  </script>
+  -->
+</body>
+</html>

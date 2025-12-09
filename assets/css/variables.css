@@ -1,0 +1,52 @@
+/* ==========================================================================
+   FILE: assets/css/variables.css
+   描述: 全局变量定义与主题配置
+   ========================================================================== */
+:root {
+  --bg: #f7f8fa;
+  --text: #1c1c1c;
+  --muted: #888;
+  --accent: #4a90e2;
+  --block-radius: 14px;
+  --shadow: rgba(0,0,0,0.06);
+
+  --c-theorem: #5A9BF0;
+  --c-definition: #61d4a0;
+  --c-lemma: #7937da;
+  --c-corollary: #FFCF80;
+  --c-example: #FF7B88;
+  --c-exercise: #FFB980;
+  --c-solution: #7FCFED;
+  --c-note: #ba74f7;
+
+  --toc-bg: #ffffff;
+  --toc-text: #1c1c1c;
+  --toc-dot: #2b6cb0;
+  --toc-link: #1a202c;
+  --toc-link-hover: #2b6cb0;
+  --toc-indent: 12px;
+}
+
+/* 暗色模式 */
+html.theme-dark {
+  --bg: #1e1e2f;
+  --text: #e0e0e0;
+  --muted: #999;
+  --c-theorem: #5A9BF0;
+  --c-definition: #5FC796;
+  --c-lemma: #A888D5;
+  --c-corollary: #FFB975;
+  --c-example: #FF7580;
+  --c-exercise: #FF9D60;
+  --c-solution: #5AB8E0;
+  --c-note: #B890E8;
+
+  --toc-bg: #2a2a3c;
+  --toc-text: #e0e0e0;
+  --toc-dot: #7FB3FF;
+  --toc-link: #e0e0e0;
+  --toc-link-hover: #9FD0FF;
+}
+
+html.theme-dark code { background: rgba(255,255,255,0.1); }
+html.theme-dark pre { background: rgba(255,255,255,0.05); }

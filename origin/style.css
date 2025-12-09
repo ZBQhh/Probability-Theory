@@ -1,0 +1,578 @@
+/* ================== 主题颜色变量 ================== */
+:root {
+  --bg: #f7f8fa;
+  --text: #1c1c1c;
+  --muted: #888;
+  --accent: #4a90e2;
+  --block-radius: 14px;
+  --shadow: rgba(0,0,0,0.06);
+
+  --c-theorem: #5A9BF0;
+  --c-definition: #61d4a0;
+  --c-lemma: #7937da;
+  --c-corollary: #FFCF80;
+  --c-example: #FF7B88;
+  --c-exercise: #FFB980;
+  --c-solution: #7FCFED;
+  --c-note: #ba74f7;
+
+  --toc-bg: #ffffff;
+  --toc-text: #1c1c1c;
+  --toc-dot: #2b6cb0;
+  --toc-link: #1a202c;
+  --toc-link-hover: #2b6cb0;
+  --toc-indent: 12px;
+}
+
+/* ================== 暗色模式 ================== */
+html.theme-dark {
+  --bg: #1e1e2f;
+  --text: #e0e0e0;
+  --muted: #999;
+  --c-theorem: #5A9BF0;
+  --c-definition: #5FC796;
+  --c-lemma: #A888D5;
+  --c-corollary: #FFB975;
+  --c-example: #FF7580;
+  --c-exercise: #FF9D60;
+  --c-solution: #5AB8E0;
+  --c-note: #B890E8;
+
+  --toc-bg: #2a2a3c;
+  --toc-text: #e0e0e0;
+  --toc-dot: #7FB3FF;
+  --toc-link: #e0e0e0;
+  --toc-link-hover: #9FD0FF;
+}
+
+html.theme-dark code { background: rgba(255,255,255,0.1); }
+html.theme-dark pre { background: rgba(255,255,255,0.05); }
+
+/* ================== 基础设置 ================== */
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Arial", "Noto Serif SC", serif;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  line-height: 1.85;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ================== 标题样式 ================== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Source Han Sans SC", "思源黑体", "Microsoft YaHei", "PingFang SC", "SimHei", sans-serif;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text);
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+h1 {
+  font-size: 2.2em;
+  margin-top: 0.5em;
+  border-bottom: 3px solid var(--accent);
+  padding-bottom: 0.3em;
+}
+
+h2 {
+  font-size: 1.8em;
+  border-bottom: 2px solid var(--muted);
+  padding-bottom: 0.25em;
+  position: relative;
+  padding-left: 1.8em;
+}
+
+h3 {
+  font-size: 1.15em;
+  color: var(--text);
+  position: relative;
+  padding-left: 1.8em;
+  margin-top: 1.2em;
+}
+
+/* H2/H3 在 main.content 中的特殊样式 */
+main.content h2 {
+  margin-top: 40px;
+  color: #d73a49;
+  text-align: center;
+  padding-left: 1em;
+}
+
+main.content h3 {
+  margin-top: 25px;
+  margin-bottom: 10px;
+  font-size: 1em;
+  padding-left: 1.0em;
+}
+
+/* ================== 文本样式 ================== */
+p { margin: 1em 0; }
+strong, b { font-weight: 600; color: var(--text); }
+em, i { font-style: italic; }
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--c-theorem);
+  text-decoration: underline;
+}
+
+/* ================== 列表 ================== */
+ul, ol {
+  margin: 0em 0;
+  padding-left: 1em;
+}
+
+li { margin: 0.5em 0; }
+
+/* ================== 引用块 ================== */
+blockquote {
+  margin: 1.5em 0;
+  padding: 1em 1.5em;
+  border-left: 4px solid var(--accent);
+  background: var(--bg);
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ================== 代码 ================== */
+code {
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  background: rgba(0,0,0,0.05);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+pre {
+  background: rgba(0,0,0,0.05);
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+/* ================== 分隔线 ================== */
+hr {
+  border: none;
+  border-top: 2px solid var(--muted);
+  margin: 2em 0;
+  opacity: 0.3;
+}
+
+/* ================== 环境块 (Theorem, Definition, etc.) ================== */
+.block {
+  position: relative;
+  margin: 2em 0;
+  padding: 1.5em 2em;
+  border-radius: var(--block-radius);
+  box-shadow: 0 4px 20px var(--shadow);
+  background: var(--bg);
+  font-family: "Arial", "Noto Serif SC", serif;
+}
+
+.block::before {
+  content: "";
+  position: absolute;
+  left: -0.6em;
+  top: 1.5em;
+  width: 8px;
+  height: 1.5em;
+  border-radius: 4px;
+  background: var(--color, var(--accent));
+}
+
+/* 环境标题 */
+.env-heading {
+  font-weight: 500;
+  margin-bottom: 0.6em;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  flex-wrap: wrap;
+  font-family: "Arial", "Source Han Sans SC";
+}
+
+.env-label {
+  font-weight: 600;
+  color: var(--color, var(--accent));
+}
+
+.env-num {
+  font-weight: 600;
+  color: var(--color, var(--accent));
+}
+
+.env-title {
+  font-weight: 500;
+  color: var(--text);
+  margin-left: 0.75em !important;
+}
+
+.env-body {
+  margin-top: 0.6em;
+}
+
+/* 环境类型颜色 */
+.type-theorem {
+  --color: var(--c-theorem);
+  font-family: "Arial", "Source Han Sans SC", serif;
+}
+
+.type-lemma {
+  --color: var(--c-lemma);
+  font-family: "Arial", "Source Han Sans SC", serif;
+  font-style: italic;
+}
+
+.type-corollary {
+  --color: var(--c-corollary);
+  font-family: "Arial", "Source Han Sans SC", serif;
+  font-style: italic;
+}
+
+.type-example {
+  --color: var(--c-example);
+  font-family: "Arial", "Source Han Sans SC";
+  font-weight: 400;
+}
+
+.type-exercise {
+  --color: var(--c-exercise);
+  font-family: "Arial", "Source Han Sans SC";
+}
+
+.type-solution {
+  --color: var(--c-solution);
+  font-family: "Arial", "Noto Serif SC", serif;
+}
+
+.type-definition {
+  --color: var(--c-definition);
+  font-family: "Source Han Sans SC", "思源黑体", sans-serif;
+  font-weight: 500;
+}
+
+.type-note {
+  --color: var(--c-note);
+  font-family: "Source Han Sans SC", "思源黑体", sans-serif;
+  font-weight: 400;
+}
+
+/* ================== 侧边栏 TOC ================== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100%;
+  background: var(--toc-bg);
+  color: var(--toc-text);
+  padding: 1em 0.9em;
+  overflow-y: auto;
+  transform: translateX(-340px);
+  transition: 0.28s ease;
+  z-index: 1000;
+  box-shadow: 0 6px 30px rgba(0,0,0,0.08);
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar .brand {
+  display: flex;
+  align-items: center;
+  margin: 0 0 0.8em 0;
+  padding: 0 0.4em;
+}
+
+.sidebar .brand .logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 0.6em;
+}
+
+.sidebar .brand h3 {
+  margin: 0;
+  font-size: 1.05em;
+}
+
+/* TOC 列表 */
+.toc {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc li {
+  margin: 6px 0;
+  padding: 0 0.4em;
+}
+
+.toc li a {
+  color: var(--toc-text);
+  text-decoration: none;
+  display: block;
+  padding: 0.25em 0;
+  border-radius: 6px;
+  font-size: 0.98em;
+}
+
+.toc li a:hover {
+  color: var(--toc-link-hover);
+  background: rgba(0,0,0,0.03);
+}
+
+.toc li a.active {
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(0,0,0,0.04);
+}
+
+.toc-h2 a {
+  font-weight: 700;
+  margin-top: 6px;
+  padding-left: 0.2em;
+}
+
+.toc-h3 a {
+  padding-left: 1.2em;
+  font-size: 0.95em;
+  opacity: 0.88;
+}
+
+/* TOC 折叠功能 */
+.toc .collapse-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.2em 0.2em;
+}
+
+.toc .collapse-toggle .caret {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(0deg);
+  margin-left: 6px;
+  transition: transform 0.18s ease;
+}
+
+.toc .collapsed > .collapse-toggle .caret {
+  transform: rotate(90deg);
+}
+
+#tocList ul.toc-sub {
+  display: none;
+  padding-left: 1.2em;
+  margin: 0.2em 0;
+  transition: all 0.2s ease;
+}
+
+#tocList ul.toc-sub.open {
+  display: block;
+}
+
+/* ================== 内容区域 ================== */
+.content {
+  padding: 2em 2em;           /* 👈 调整这里改变内边距 */
+  margin-left: 0;
+  max-width: 1200px;          /* 👈 调整这里改变最大宽度 */
+  transition: margin-left 0.28s ease;
+}
+
+/* 桌面端布局 */
+@media(min-width: 900px) {
+  .sidebar {
+    transform: none;
+  }
+  
+  .toc-toggle {
+    display: none;
+  }
+  
+  .content {
+    margin-left: 350px;       /* 👈 侧边栏宽度 + 间距 */
+    padding: 2em 3em;         /* 👈 桌面端内边距 */
+  }
+}
+
+/* 超宽屏优化 */
+@media(min-width: 1400px) {
+  .content {
+    padding: 2em 5em;         /* 👈 超宽屏内边距 */
+  }
+}
+
+/* ================== 移动端 TOC 按钮 ================== */
+.toc-toggle {
+  position: fixed;
+  top: 1em;
+  left: 1em;
+  z-index: 1100;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0.4em 0.6em;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.toc-toggle.hidden {
+  display: none !important;
+}
+
+.toc-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.2s;
+  z-index: 900;
+}
+
+.toc-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ================== 公式相关 ================== */
+/* 公式编号 */
+.formula-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1em;
+}
+
+.formula {
+  flex: 1;
+  text-align: center;
+}
+
+.equation-num {
+  margin-left: auto;
+  color: var(--muted);
+  white-space: nowrap;
+  font-size: 0.95em;
+}
+
+/* 彩色公式 */
+.color-formula {
+  display: flex;
+  align-items: flex-start;
+  margin: 1.2em 0;
+  gap: 0.8em;
+}
+
+.color-formula .formula-left-line {
+  width: 4px;
+  background: var(--fcolor);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.color-formula .formula-core {
+  flex: 1;
+}
+
+.color-formula .formula {
+  font-size: 1.05em;
+  margin-bottom: 0.3em;
+}
+
+.color-formula .formula-meta {
+  font-size: 0.9em;
+  color: #666;
+  display: flex;
+  gap: 0.6em;
+}
+
+.color-formula .equation-num {
+  font-weight: bold;
+  color: var(--fcolor);
+}
+
+.color-formula .equation-name {
+  font-style: italic;
+}
+
+/* 公式盒子 */
+.block.type-formula-box {
+  --color: var(--box-color, #409EFF);
+  border-left: none;
+  padding-left: 1em;
+  margin: 1.6em 0;
+}
+
+.block.type-formula-box .env-heading {
+  padding-left: 0.6em;
+  margin-bottom: 0.5em;
+  border-left: none;
+  font-weight: 500;
+  font-family: "Source Han Sans SC", "Times New Roman";
+}
+
+.block.type-formula-box .env-label,
+.block.type-formula-box .env-num,
+.block.type-formula-box .env-title {
+  color: var(--color);
+  font-weight: 500;
+  font-family: "Source Han Sans SC", "Times New Roman";
+}
+
+/* ================== 其他功能 ================== */
+/* 公式锚点偏移 */
+:target {
+  scroll-margin-top: 90px;
+}
+
+/* ================== 打印优化 ================== */
+@media print {
+  .sidebar,
+  .toc-toggle,
+  .toc-overlay,
+  button {
+    display: none;
+  }
+  
+  body {
+    background: #fff;
+    color: #000;
+  }
+  
+  .block {
+    box-shadow: none;
+  }
+}

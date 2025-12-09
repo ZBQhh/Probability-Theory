@@ -1,0 +1,100 @@
+/* ==========================================================================
+   FILE: assets/css/print.css
+   描述: 打印与 PDF 导出专用样式 (学术排版标准)
+   ========================================================================== */
+@media print {
+  /* 1. 强制重置变量 (确保无论当前是什么主题，打印都是白底黑字) */
+  :root, html, body, html.theme-dark {
+    --bg: #ffffff !important;
+    --text: #000000 !important;
+    --muted: #555555 !important;
+    --accent: #000000 !important; /* 强调色变黑 */
+    --shadow: none !important;
+    
+    /* 保持环境块的彩色识别度，或改为灰度，这里选择保留深色以便区分 */
+    --c-theorem: #333 !important;
+    --c-definition: #333 !important;
+    --c-lemma: #333 !important;
+    --c-corollary: #333 !important;
+    --c-example: #555 !important;
+    --c-exercise: #555 !important;
+    --c-solution: #555 !important;
+    --c-note: #555 !important;
+  }
+
+  /* 2. 隐藏交互无关元素 */
+  .sidebar,
+  .toc-toggle,
+  .toc-overlay,
+  button,
+  script,
+  .no-print {
+    display: none !important;
+  }
+
+  /* 3. 布局重置 */
+  body {
+    font-size: 11pt; /* 适合阅读的打印字号 */
+    line-height: 1.5;
+    background: white;
+    color: black;
+  }
+
+  .content {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: none !important;
+  }
+
+  /* 4. 分页控制 */
+  /* 章节标题前强制分页 */
+  h2 {
+    page-break-before: always; 
+    margin-top: 0;
+  }
+
+  /* 防止标题和内容断开 */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  /* 防止环境块、公式内部断页 */
+  .block, 
+  .formula-wrapper, 
+  pre, 
+  blockquote, 
+  figure,
+  table {
+    page-break-inside: avoid;
+  }
+
+  /* 5. 元素样式微调 */
+  /* 环境块：移除阴影，改为边框 */
+  .block {
+    border: 1px solid #ccc;
+    box-shadow: none !important;
+    margin: 1em 0;
+    padding: 1em;
+    background-color: transparent !important;
+  }
+  
+  /* 链接：移除颜色，打印时可选显示 URL (这里选择不显示，保持整洁) */
+  a {
+    text-decoration: none !important;
+    color: #000 !important;
+  }
+
+  /* 代码块 */
+  pre, code {
+    border: 1px solid #eee;
+    background: #f9f9f9 !important; /* 极淡的灰底辅助阅读 */
+    color: #000 !important;
+  }
+
+  /* 公式 */
+  .formula-wrapper {
+    margin: 0.5em 0;
+  }
+}

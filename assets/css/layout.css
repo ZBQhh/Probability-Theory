@@ -1,0 +1,182 @@
+/* ==========================================================================
+   FILE: assets/css/layout.css
+   描述: 页面宏观布局、侧边栏、响应式规则
+   ========================================================================== */
+
+/* ================== 内容区域 ================== */
+.content {
+  padding: 2em 3em;           /* 桌面端默认内边距 */
+  margin-left: 0;
+  max-width: 1200px;
+  min-height: 100vh;
+  transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* 关键：防止正文撑开页面 */
+  box-sizing: border-box;
+  overflow-x: hidden; 
+  width: 100%;
+}
+
+/* 覆盖 H2/H3 样式 (base.css 提供基础，这里提供布局间距) */
+main.content h2 {
+  margin-top: 60px;
+  margin-bottom: 25px;
+  color: #d73a49;
+  text-align: center;
+  border-left: none;          /* 移除 base.css 的左侧线，改为居中 */
+  border-bottom: none;
+  padding-left: 0;
+}
+
+main.content h3 {
+  margin-top: 35px;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  padding-left: 0.8em;
+  border-left: 5px solid var(--accent);
+}
+
+/* ================== 侧边栏容器 ================== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100%;
+  background: var(--toc-bg);
+  color: var(--toc-text);
+  padding: 1em 1em;
+  overflow-y: auto;
+  transform: translateX(-105%); /* 默认移出屏幕 */
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.05);
+  box-sizing: border-box;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar .brand {
+  display: flex;
+  align-items: center;
+  margin: 0 0 1.2em 0;
+  padding: 0 0.5em;
+}
+
+.sidebar .brand .logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-right: 0.8em;
+}
+
+.sidebar .brand h3 {
+  margin: 0;
+  font-size: 1.1em;
+}
+
+.sidebar-footer {
+  margin-top: 2em;
+  padding-top: 1em;
+  border-top: 1px solid var(--muted);
+  opacity: 0.8;
+}
+
+.theme-btn {
+  width: 100%;
+  padding: 0.6em;
+  background: transparent;
+  border: 1px solid var(--muted);
+  color: var(--text);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.theme-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ================== 移动端 TOC 交互 ================== */
+.toc-toggle {
+  position: fixed;
+  top: 1em;
+  left: 1em;
+  z-index: 1100;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid rgba(0,0,0,0.1);
+  padding: 0.4em 0.8em;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.toc-toggle.hidden { display: none !important; }
+
+.toc-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s;
+  z-index: 900;
+}
+
+.toc-overlay.show { opacity: 1; visibility: visible; }
+
+/* ================== 响应式适配 (移动端优先逻辑) ================== */
+
+/* 1. 手机端适配 */
+@media (max-width: 899px) {
+  .content {
+    /* 核心修改：减小内边距，让手机每行多显示几个字 */
+    /* 把原来的 2em 改为 1em，增加中间的正文宽度 */
+    padding: 1.5em 1em; 
+    
+    /* 再次确认防溢出 */
+    width: 100%;
+    overflow-x: hidden; 
+  }
+  
+  main.content h2 {
+    font-size: 1.6em;
+    margin-top: 40px;
+  }
+}
+
+/* 2. 桌面端适配 */
+@media (min-width: 900px) {
+  .sidebar { transform: none; }
+  .toc-toggle { display: none; }
+  
+  .content {
+    margin-left: 280px; /* 留出侧边栏位置 */
+    padding: 3em 4em;   /* 桌面端保持宽敞 */
+  }
+}
+
+/* 3. 超宽屏适配 */
+@media (min-width: 1400px) {
+  .content {
+    padding: 4em 6em;
+    max-width: 1400px;
+  }
+}
