@@ -1,52 +1,139 @@
 /* ==========================================================================
    FILE: assets/css/base.css
-   描述: 基础排版 + 极致丝滑的移动端滑动体验
+   描述: 基础排版 + MathJax 布局 + 触控优化
+   (已完全对接 variables.css，实现单一数据源控制)
    ========================================================================== */
 
-/* ================== 1. 原始视觉样式 (保持不变) ================== */
-html { scroll-behavior: smooth; overflow-x: hidden; }
+/* ================== 1. 基础排版 (Typography & Reset) ================== */
+html { 
+  scroll-behavior: smooth; 
+  overflow-x: hidden; 
+}
 
 body {
-  font-family: "Arial", "Noto Serif SC", serif;
+  /* 1. 字体完全由变量控制 */
+  font-family: var(--font-body, serif);
   max-width: 100%;
-  margin: 0; padding: 0;
+  margin: 0; 
+  padding: 0;
   line-height: 1.85;
+  /* 2. 颜色完全由变量控制 */
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
 }
 
+/* --- 标题通用样式 --- */
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Source Han Sans SC", "思源黑体", "Microsoft YaHei", sans-serif;
-  font-weight: 600; line-height: 1.4; color: var(--text);
-  margin-top: 1.5em; margin-bottom: 0.75em; word-break: break-word;
+  font-family: var(--font-heading, sans-serif);
+  font-weight: 600; 
+  line-height: 1.4; 
+  color: var(--text);
+  margin-top: 1.5em; 
+  margin-bottom: 0.75em; 
+  word-break: break-word;
 }
-h1 { font-size: 2.2em; margin-top: 0.5em; border-bottom: 3px solid var(--accent); padding-bottom: 0.3em; }
-h2 { font-size: 1.8em; border-bottom: 2px solid var(--muted); padding-bottom: 0.25em; position: relative; padding-left: 1.8em; }
-h3 { font-size: 1.15em; color: var(--text); position: relative; padding-left: 1.8em; margin-top: 1.2em; }
 
+h1 { 
+  font-size: 2.2em; 
+  margin-top: 0.5em; 
+  border-bottom: 3px solid var(--accent); 
+  padding-bottom: 0.3em; 
+}
+
+h2 { 
+  font-size: 1.8em; 
+  border-bottom: 2px solid var(--muted); 
+  padding-bottom: 0.25em; 
+  position: relative; 
+}
+
+h3 { 
+  font-size: 1.15em; 
+  color: var(--text); 
+  position: relative; 
+  margin-top: 1.2em; 
+}
+
+/* 💥 [核心对接] 标题序号间距 */
+/* 统一控制 JS 生成的 <span class="heading-number"> */
+.heading-number,
+.sec-num,
+.subsec-num {
+  /* 引用变量：去 variables.css 修改 --heading-num-spacing 即可全局生效 */
+  margin-right: var(--heading-num-spacing, 0.8em) !important;
+  display: inline-block; /* 防止换行 */
+}
+
+/* 备选：如果有些序号是 CSS 计数器生成的 */
+h3::before, h4::before {
+  margin-right: var(--heading-num-spacing, 0.8em);
+}
+
+/* --- 正文元素 --- */
 p { margin: 1em 0; text-align: justify; }
+
 strong, b { font-weight: 600; color: var(--text); }
 em, i { font-style: italic; }
-a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
-a:hover { color: var(--c-theorem); text-decoration: underline; }
 
+/* --- 链接 --- */
+a { 
+  color: var(--accent); 
+  text-decoration: none; 
+  transition: color 0.2s; 
+}
+a:hover { 
+  color: var(--text); /* hover 时稍微变深一点，或者你可以定义专门的变量 */
+  text-decoration: underline; 
+}
+
+/* --- 列表 --- */
 ul, ol { margin: 0em 0; padding-left: 1em; }
 li { margin: 0.5em 0; }
-blockquote { margin: 1.5em 0; padding: 1em 1.5em; border-left: 4px solid var(--accent); background: var(--bg); color: var(--muted); font-style: italic; }
 
-code { font-family: "Consolas", "Monaco", monospace; background: rgba(0,0,0,0.05); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; color: var(--accent); word-break: break-all; }
-pre { background: rgba(0,0,0,0.05); padding: 1em; border-radius: 8px; overflow-x: auto; margin: 1.5em 0; max-width: 100%; }
+/* --- 引用块 --- */
+blockquote { 
+  margin: 1.5em 0; 
+  padding: 1em 1.5em; 
+  border-left: 4px solid var(--accent); 
+  background: var(--bg); /* 保持背景一致，或者定义 --bg-secondary */
+  color: var(--muted); 
+  font-style: italic; 
+}
+
+/* --- 代码块 --- */
+code { 
+  font-family: var(--font-mono, monospace); 
+  background: rgba(0,0,0,0.05); 
+  padding: 0.2em 0.4em; 
+  border-radius: 4px; 
+  font-size: 0.9em; 
+  color: var(--accent); 
+  word-break: break-all; 
+}
+
+pre { 
+  background: rgba(0,0,0,0.05); 
+  padding: 1em; 
+  border-radius: 8px; 
+  overflow-x: auto; 
+  margin: 1.5em 0; 
+  max-width: 100%; 
+}
 pre code { background: none; padding: 0; color: inherit; }
 
 hr { border: none; border-top: 2px solid var(--muted); margin: 2em 0; opacity: 0.3; }
+
+/* --- 锚点跳转偏移 (防止被顶部导航遮挡) --- */
 :target { scroll-margin-top: 90px; }
 
-@keyframes flash-highlight { 0% { background-color: rgba(255, 255, 0, 0.3); } 100% { background-color: transparent; } }
+/* --- 引用高亮动画 --- */
+@keyframes flash-highlight { 
+  0% { background-color: rgba(255, 255, 0, 0.3); } 
+  100% { background-color: transparent; } 
+}
 .highlight-flash { animation: flash-highlight 2s ease-out; border-radius: 4px; }
-a.ref-link { color: var(--accent); border-bottom: 1px dashed var(--accent); padding: 0 2px; border-radius: 3px; }
-a.ref-link:hover { background-color: rgba(74, 144, 226, 0.1); text-decoration: none; }
 
 
 /* ==========================================================================
@@ -60,25 +147,21 @@ a.ref-link:hover { background-color: rgba(74, 144, 226, 0.1); text-decoration: n
   clear: both;
 }
 
-/* 2. 滚动笼子 (重点优化区域) */
+/* 2. 滚动容器 */
 .math-scroll-view {
   width: 100%;
-  
-  /* Flex 适配 */
   flex: 1; width: 0; min-width: 0;
-  
-  /* 滚动机制 */
   overflow-x: auto;
   overflow-y: hidden;
   text-align: center;
   padding-bottom: 6px;
   
-  /* 💥 [新增] 移动端触控核心优化 */
-  -webkit-overflow-scrolling: touch; /* iOS 惯性滚动 */
-  touch-action: pan-x;               /* 告诉浏览器：这里专门处理水平滑动，不要等待点击 */
-  -webkit-tap-highlight-color: transparent; /* 禁止点击时出现蓝色高亮块 */
-  cursor: grab;                      /* 鼠标变成抓手，提示可拖动 */
-  user-select: text;                 /* 允许复制，但不允许大块误选 */
+  /* 触控优化 */
+  -webkit-overflow-scrolling: touch; 
+  touch-action: pan-x;               
+  -webkit-tap-highlight-color: transparent;
+  cursor: grab;                      
+  user-select: text;                 
 }
 
 /* 滚动条样式 */
@@ -103,8 +186,6 @@ a.ref-link:hover { background-color: rgba(74, 144, 226, 0.1); text-decoration: n
 mjx-container[display="true"] {
   display: block !important; overflow-x: auto !important; overflow-y: hidden;
   max-width: 100% !important; width: 100% !important; margin: 0.5em 0 !important; padding-bottom: 4px;
-  
-  /* 💥 [新增] 传递触控优化 */
   touch-action: pan-x;
   -webkit-tap-highlight-color: transparent;
 }
@@ -112,11 +193,22 @@ mjx-container[display="true"] {
 .math-scroll-view mjx-container[display="true"] {
   display: inline-block !important; overflow: visible !important;
   max-width: none !important; width: auto !important; margin: 0 !important; vertical-align: middle;
-  
-  /* 💥 [新增] 禁止 MathJax 内部拦截点击事件，确保滑动优先 */
-  /* pointer-events: none; 不要加这个，否则不能长按复制公式 */
 }
 mjx-math { outline: none; }
+
+
+/* ==========================================================================
+   3. MathJax 行内公式优化 (已修正变量名)
+   ========================================================================== */
+/* 选中行内公式 (排除 display="true" 的块级公式) */
+mjx-container:not([display="true"]) {
+  /* 💥 核心对接：修正为 --inline-math-spacing 以匹配 variables.css */
+  margin-left: var(--inline-math-spacing, 0.15em) !important;
+  margin-right: var(--inline-math-spacing, 0.15em) !important;
+  
+  /* 防撑大行高 */
+  line-height: normal; 
+}
 
 
 /* ================== 响应式布局 ================== */
@@ -134,7 +226,6 @@ mjx-math { outline: none; }
   .math-display-block { display: block; }
   .math-scroll-view { display: block; width: 100%; }
   
-  /* 手机端信息栏 */
   .math-info {
     display: block;
     width: 100%;

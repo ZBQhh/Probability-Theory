@@ -121,20 +121,32 @@ MathBook.search = {
   },
 
   /**
-   * 动态注入 HTML 结构
+   * 💥 修复点：动态注入 HTML 结构，按钮位置修正
    * 对应 components.css 中的 .search-toggle, .search-overlay 等
    */
   injectUI() {
-    // 1. 在侧边栏插入搜索按钮 (如果尚未存在)
     const sidebar = document.querySelector('.sidebar');
-    if (sidebar && !document.querySelector('.search-toggle')) {
+    if (!sidebar) return;
+
+    // 1. 在侧边栏插入搜索按钮 (如果尚未存在)
+    if (!document.querySelector('.search-toggle')) {
       const btn = document.createElement('button');
       btn.className = 'search-toggle';
-      btn.innerHTML = '🔍 搜索内容 (Ctrl+K)';
+      // 图标 + 文字
+      btn.innerHTML = `
+        <span style="font-size:1.1em">🔍</span>
+        <span>搜索内容 (Ctrl+K)</span>
+      `;
       btn.onclick = () => this.open();
-      // 插入到侧边栏顶部品牌下方
+      
+      // 💥 关键修复：插入到 .brand (Logo) 的后面，而不是 sidebar 的最后
       const brand = sidebar.querySelector('.brand');
-      if (brand) brand.insertAdjacentElement('afterend', btn);
+      if (brand) {
+        brand.insertAdjacentElement('afterend', btn);
+      } else {
+        // 如果找不到 brand，才插到最前面
+        sidebar.insertBefore(btn, sidebar.firstChild);
+      }
     }
 
     // 2. 插入全屏搜索模态框
@@ -168,7 +180,7 @@ MathBook.search = {
     const results = this.fuse.search(query);
 
     if (results.length === 0) {
-      ul.innerHTML = '<li style="padding:1em; color:#888; text-align:center;">未找到相关内容</li>';
+      ul.innerHTML = '<li style="padding:1em; color:var(--muted, #888); text-align:center;">未找到相关内容</li>';
       return;
     }
 
@@ -183,7 +195,7 @@ MathBook.search = {
           <span class="res-tag">${item.type}</span>
           <span class="res-text">
             <strong>${item.title}</strong>
-            <span style="font-size:0.85em; color:#999; margin-left:0.5em;">
+            <span style="font-size:0.85em; opacity:0.7; margin-left:0.5em;">
               ${item.text.substring(0, 30)}...
             </span>
           </span>
@@ -217,6 +229,11 @@ MathBook.search = {
       
       // 3. 更新 URL hash
       history.pushState(null, null, `#${id}`);
+      
+      // 4. 移动端跳转后自动关闭侧边栏
+      if (window.innerWidth < 900 && MathBook.toc && MathBook.toc.close) {
+        MathBook.toc.close();
+      }
     }
   },
 

@@ -1,183 +1,148 @@
 /* ==========================================================================
    FILE: assets/css/components.css
-   描述: UI 组件 (优雅的悬浮链接版)
+   描述: UI 组件 (嵌入式链接版 - 极简布局)
    ========================================================================== */
 
-/* ================== 1. 环境块与 Permalink ================== */
+/* ================== 1. 环境块 (Block) ================== */
 .block {
   position: relative;
   margin: 1.8em 0;
   padding: 1.2em 1.5em;
-  border-radius: var(--block-radius);
-  box-shadow: 0 4px 15px var(--shadow);
-  transition: box-shadow 0.3s ease;
-  font-family: "Arial", "Noto Serif SC", sans-serif;
+  border-radius: 8px;
   
-  /* 确保 permalink 绝对定位以此为基准 */
+  /* 基础外观 (配合 variables.css) */
+  background: var(--block-bg); 
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.3s ease, background 0.3s ease;
   overflow: hidden; 
+  
+  font-family: var(--font-body);
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
-/* 标题区域 */
+/* ================== 2. 标题区域 ================== */
 .env-heading {
+  display: block; /* 简单的块级元素 */
+  width: 100%;
   margin-bottom: 0.8em;
   line-height: 1.5;
   
-  /* 💥 核心修改：移除右侧强制留白 */
-  /* 让标题文字可以流向最右边，不再浪费手机屏幕空间 */
+  font-family: var(--font-heading);
+  color: var(--env-title-color);
+  
+  /* 💥 关键：不再需要留白了，因为没有浮动按钮了 */
   padding-right: 0; 
-  
-  position: relative;
-  width: 100%;
 }
 
-/* 💥 Permalink (复制链接 ¶) 智能悬浮版 */
-.permalink {
-  position: absolute;
-  /* 定位到右上角，稍微留点边距 */
-  top: 0.5em;
-  right: 0.5em;
-  
-  width: 2em;
-  height: 2em;
-  line-height: 2em;
-  text-align: center;
-  font-size: 1.2em;
-  
-  color: var(--accent);
+/* 强制流式排版 */
+.env-heading > * {
+  display: inline;
+  margin: 0;
+  vertical-align: baseline;
+}
+
+/* ================== 3. 💥 嵌入式链接样式 (核心修改) ================== */
+/* 这是包裹住 "定义 1.1" 的那个 <a> 标签 */
+.env-link {
   text-decoration: none;
-  border-radius: 50%; /* 圆形按钮更现代 */
-  
-  /* 核心技巧：平时隐身且“穿透” */
-  opacity: 0;
-  pointer-events: none; /* 关键！隐藏时鼠标可以穿透它去复制下面的文字 */
-  transform: scale(0.8);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  z-index: 20; /* 保证在最上层 */
-
-  /* 优雅的遮盖背景：当它出现时，为了防止和底部文字重叠看不清，
-     给它加一个和环境块一样的背景色，形成“遮罩”效果 */
-  background-color: var(--block-bg); 
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  backdrop-filter: blur(2px); /* 磨砂玻璃感 (可选) */
-}
-
-/* 交互逻辑 */
-
-/* 1. 鼠标悬停 (PC) */
-.block:hover .permalink {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: auto; /* 出现后，恢复可点击状态 */
-}
-
-/* 2. 触摸激活 (Mobile) */
-/* 在手机上，点击环境块时，链接浮现 */
-.block:active .permalink,
-.block:focus-within .permalink {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: auto;
-}
-
-.permalink:hover {
-  background-color: var(--accent);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(var(--accent-rgb, 0,0,0), 0.3);
-}
-
-/* 公式环境内的 Permalink */
-.math-display-block {
-  position: relative;
-}
-/* 公式块悬停时显示 */
-.math-display-block:hover .permalink {
-  opacity: 1;
-  pointer-events: auto;
-}
-.math-display-block .permalink {
-  top: 0;
-  right: 0;
-  background-color: transparent; /* 公式块通常空白较多，不需要背景遮罩 */
-  box-shadow: none;
-}
-
-
-/* ================== 2. 目录 (TOC) 样式 (保持之前的逻辑) ================== */
-.toc { list-style: none; padding: 0; margin: 0; }
-
-.toc-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 2px 0;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-.toc-row:hover { background: var(--toc-hover); }
-
-.toc-link {
-  flex: 1;
-  padding: 0.6em 0.5em;
-  color: var(--toc-text);
-  text-decoration: none;
-  font-size: 0.95em;
-  font-weight: 500;
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.toc-link.active { color: var(--accent); font-weight: 700; }
-
-.toc-toggle-btn {
-  width: 34px; /* 稍微加大触控区域 */
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
+  color: inherit; /* 继承环境颜色 (蓝色/紫色等) */
+  transition: opacity 0.2s ease;
+  
+  /* 可选：为了让点击区域稍微大一点，不容易点歪 */
+  padding: 2px 4px 2px 0;
+  border-radius: 4px;
+}
+
+.env-link:hover {
+  opacity: 0.8;
+  text-decoration: none; /* 悬浮时加下划线提示可点击 */
+  text-underline-offset: 4px;
+}
+
+/* 间距控制 */
+.env-label {
+  margin-right: 0.3em; 
+}
+
+.env-num {
+  margin-right: 0.75em; /* 定义1.1 与 标题 的距离 */
+  font-weight: bold;
+}
+
+/* 标题文字 */
+.env-title {
+  font-weight: bold;
+  color: var(--env-title-color);
+}
+
+/* ================== 4. 公式的链接 (保留小 ¶) ================== */
+/* 因为公式是居中的，没法嵌入，所以保留这个小按钮 */
+.permalink-formula {
+  position: absolute;
+  top: 0; right: 0;
   color: var(--muted);
-  font-size: 0.8em;
-  transition: transform 0.3s ease;
-}
-.toc-toggle-btn:hover { color: var(--accent); }
-
-.toc-item-h2 .toc-sub {
-  display: block;
-  padding-left: 1.2em;
-  max-height: 1000px; 
-  overflow: hidden;
-  transition: max-height 0.4s ease-out, opacity 0.4s ease;
-  opacity: 1;
-}
-.toc-item-h2.collapsed .toc-sub {
-  max-height: 0;
-  opacity: 0;
-}
-.toc-item-h2.collapsed .toc-toggle-btn {
-  transform: rotate(-90deg);
-}
-
-.toc-item-h3 a {
-  display: block;
-  padding: 0.4em 0.5em 0.4em 1em;
-  color: var(--toc-text);
-  opacity: 0.85;
   text-decoration: none;
-  font-size: 0.9em;
-  border-left: 2px solid transparent;
+  font-size: 1.2em;
+  opacity: 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+  font-family: sans-serif;
 }
-.toc-item-h3 a:hover { color: var(--accent); opacity: 1; }
-.toc-item-h3 a.active {
-  color: var(--accent);
-  border-left-color: var(--accent);
-  background: var(--toc-active-bg);
-  opacity: 1;
+.math-display-block:hover .permalink-formula { opacity: 1; }
+.permalink-formula:hover { color: var(--accent); }
+
+/* 环境正文 */
+.env-body { 
+  display: block; width: 100%; clear: both;
+  color: var(--text); 
 }
 
-/* ================== 3. 其他通用 ================== */
-.env-body { color: var(--text); }
-.search-box { background: var(--bg); border: 1px solid var(--muted); }
-#searchInput { background: transparent; color: var(--text); }
-.res-tag { color: #fff !important; }
+
+/* ================== 5. 其他组件 (保持不变) ================== */
+
+/* TOC 按钮 */
+.toc-toggle { transition: transform 0.3s ease, opacity 0.3s ease; z-index: 100; cursor: pointer; }
+.toc-toggle.hidden { opacity: 0; pointer-events: none; transform: translateY(-20px); }
+
+/* 目录列表 */
+.toc { list-style: none; padding: 0; margin: 0; }
+.toc-row { display: flex; align-items: center; justify-content: space-between; margin: 2px 0; border-radius: 6px; transition: background 0.2s; }
+.toc-row:hover { background: var(--toc-hover); }
+.toc-link { flex: 1; padding: 0.6em 0.5em; color: var(--toc-text); text-decoration: none; font-size: 0.95em; font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.toc-link.active { color: var(--accent); font-weight: 700; }
+.toc-toggle-btn { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); transition: transform 0.3s ease; }
+.toc-toggle-btn:hover { color: var(--accent); }
+.toc-item-h2 .toc-sub { display: block; padding-left: 1.2em; max-height: 1000px; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.4s ease; opacity: 1; }
+.toc-item-h2.collapsed .toc-sub { max-height: 0; opacity: 0; }
+.toc-item-h2.collapsed .toc-toggle-btn { transform: rotate(-90deg); }
+.toc-item-h3 a { display: block; padding: 0.4em 0.5em 0.4em 1em; color: var(--toc-text); opacity: 0.85; text-decoration: none; font-size: 0.9em; border-left: 2px solid transparent; }
+.toc-item-h3 a:hover { color: var(--accent); opacity: 1; }
+.toc-item-h3 a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(59, 130, 246, 0.1); opacity: 1; }
+
+/* 搜索 */
+.search-toggle { width: 100%; padding: 0.75rem 1rem; margin: 0.5rem 0; background: var(--block-bg); border: 1px solid var(--muted); opacity: 0.8; border-radius: 8px; cursor: pointer; font-size: 0.95rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease; font-family: var(--font-heading); }
+.search-toggle:hover { opacity: 1; border-color: var(--accent); transform: translateY(-1px); }
+.search-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.search-box { width: 90%; max-width: 600px; background: var(--bg); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); overflow: hidden; animation: slideDown 0.3s ease; max-height: 80vh; display: flex; flex-direction: column; }
+@keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+#searchInput { width: 100%; padding: 1.2rem 1.5rem; border: none; border-bottom: 1px solid var(--muted); font-size: 1.1rem; outline: none; background: transparent; color: var(--text); font-family: inherit; box-sizing: border-box; }
+#searchInput::placeholder { color: var(--muted); opacity: 0.6; }
+#searchInput:focus { border-bottom-color: var(--accent); }
+#searchResults { list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto; flex: 1; }
+#searchResults::-webkit-scrollbar { width: 8px; }
+#searchResults::-webkit-scrollbar-track { background: var(--bg); }
+#searchResults::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 4px; }
+#searchResults li { border-bottom: 1px solid var(--muted); opacity: 0.3; }
+#searchResults li:last-child { border-bottom: none; }
+#searchResults a { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; text-decoration: none; color: var(--text); transition: background 0.2s ease; }
+#searchResults a:hover { background: rgba(0,0,0,0.05); }
+
+/* 移动端适配 */
+@media (max-width: 600px) {
+  .block { padding: 1em 1em; }
+  .search-box { width: 95%; max-width: none; margin: 1rem; }
+}

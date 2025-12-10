@@ -5,12 +5,13 @@
 /* assets/js/mathJaxConfig.js */
 window.MathJax = {
   loader: {
-    load: ['ui/lazy'] // 💥 核心优化：加载懒渲染组件
+    load: ['ui/lazy', '[tex]/ams'] // 💥 核心优化：加载懒渲染组件和AMS扩展
   },
   tex: {
     inlineMath: [['$', '$'], ['\\(', '\\)']],
     displayMath: [['$$', '$$']],
     tags: 'ams',
+    packages: {'[+]': ['ams']}, // 💥 新增：确保加载 AMS 包以支持多行公式环境
     macros: {
       // 常用宏定义保持不变
       R: "\\mathbb{R}", N: "\\mathbb{N}", Z: "\\mathbb{Z}",
