@@ -124,6 +124,23 @@ $$
       $$F(x) = \\begin{cases} 0, & x < a, \\\\ \\frac{x-a}{b-a}, & a \\leqslant x < b, \\\\ 1, & x \\geqslant b. \\end{cases}$$
       记为$X \\sim U(a, b)$.
     `)
+    .tikz(`
+     % 画坐标轴
+    \\draw[->] (-3,0) -- (3,0) node[right] {$x$};
+    \\draw[->] (0,0) -- (0,1.5) node[above] {$f(x)$};
+    
+    % 画正态分布曲线
+    \\draw[domain=-2.5:2.5, smooth, variable=\\x, blue, thick] plot ({\\x}, {exp(-(\\x*\\x)/2)});
+    
+    % 画辅助线和标注 (模拟 mu 和 sigma)
+    \\draw[dashed] (0,0) -- (0,1); 
+    \\draw[dashed] (1,0) -- (1,0.6);
+    \\draw[dashed] (-1,0) -- (-1,0.6);
+    
+    \\node[below] at (0,0) {$\\mu$};
+    \\node[below] at (1,0) {$\\mu+\\sigma$};
+    \\node[below] at (-1,0) {$\\mu-\\sigma$};
+  `, '动态渲染的 TikZ 图')
     .definition('指数分布 $E(\\lambda)$', `
       随机变量$X$的取值范围为区间$(0, +\\infty)$,密度函数和分布函数为：
       $$f(x) = \\begin{cases} \\lambda e^{-\\lambda x}, & x > 0, \\\\ 0, & \\text{其他}. \\end{cases}$$

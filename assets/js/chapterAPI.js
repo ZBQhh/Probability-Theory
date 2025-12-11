@@ -1,6 +1,6 @@
 /* ==========================================================================
    FILE: assets/js/chapterAPI.js
-   描述: 章节内容构建 API (嵌入式链接版 - 对接 Config)
+   描述: 章节内容构建 API (嵌入式链接版 - 对接 Config - 含 Image 方法)
    ========================================================================== */
 (function() {
   // 确保 config 已加载 (MathBook.config 必须存在)
@@ -98,7 +98,19 @@
         `);
       },
 
-      /* 4. 警告/提示/引用/代码 */
+      /* 4. 图片插入 (新增!) */
+      image(src, caption = "", width = "100%") {
+        // 如果是 svg，width 默认给小一点可能更好看，比如 80%
+        // 但为了通用，默认给 100% 或者 auto
+        return this._add(`
+          <div class="block-image" style="text-align: center; margin: 2em 0;">
+            <img src="${src}" alt="${utils.escapeHtml(caption)}" style="max-width: ${width}; height: auto; border-radius: 4px;">
+            ${caption ? `<div class="image-caption" style="font-size: 0.9em; color: var(--muted); margin-top: 0.5em; font-style: italic;">${utils.escapeHtml(caption)}</div>` : ''}
+          </div>
+        `);
+      },
+
+      /* 5. 警告/提示/引用/代码 */
       warning(title, html) {
         const titleHtml = (title && title.trim()) ? `<span class="env-title">${utils.escapeHtml(title)}</span>` : '';
         return this._add(`<div class="block type-warning" data-generated="1"><div class="env-heading"><span class="env-label">⚠️ ${config.language === 'en' ? 'Warning' : '警告'}</span>${titleHtml}</div><div class="env-body">${html}</div></div>`);
@@ -119,7 +131,6 @@
     chap.content.push(`<h2 id="${chapId}" data-generated="1">${utils.escapeHtml(title)}</h2>`);
 
     // ==================== 批量生成环境 (读取 Config) ====================
-    // 💥 关键修改：不再遍历本地对象，而是遍历 config.environments
     const envKeys = Object.keys(config.environments).filter(k => k !== 'default');
     
     envKeys.forEach(type => {
@@ -139,7 +150,7 @@
         
         const titleHtml = (title && title.trim()) ? `<span class="env-title">${utils.escapeHtml(title)}</span>` : '';
         
-        // 💥 从 Config 获取颜色和名称
+        // 从 Config 获取颜色和名称
         const color = utils.getEnvColor(type);
         const envName = utils.getEnvName(type);
         

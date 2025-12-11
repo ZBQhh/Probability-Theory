@@ -1,6 +1,6 @@
 /* ==========================================================================
    FILE: assets/js/toc.js
-   描述: 目录生成与交互逻辑 (支持折叠/展开 + 自动隐藏按钮)
+   描述: 目录生成与交互逻辑 (每次打开都重置为折叠状态)
    ========================================================================== */
 MathBook.toc = {
   init() {
@@ -20,6 +20,7 @@ MathBook.toc = {
     container.querySelectorAll("h2, h3").forEach(heading => {
       const { id, textContent, tagName } = heading;
       const num = heading.dataset.number;
+      // 移除标题中的序号，防止目录里显示双重序号
       const text = textContent.replace(/^\d+(\.\d+)?\s*/, "").trim();
 
       const link = document.createElement("a");
@@ -30,7 +31,9 @@ MathBook.toc = {
 
       if (tagName === "H2") {
         const li = document.createElement("li");
-        li.className = "toc-item-h2";
+        
+        // 默认初始化也是折叠的
+        li.className = "toc-item-h2 collapsed";
         
         const row = document.createElement("div");
         row.className = "toc-row";
@@ -77,7 +80,17 @@ MathBook.toc = {
       target.scrollIntoView({ behavior: "smooth" });
       history.pushState(null, null, `#${targetId}`);
     }
+    
     this.setActive(targetId);
+
+    // 点击链接时，强制展开当前父级，让用户看到子菜单
+    const activeLink = document.querySelector(`.toc a[href="#${targetId}"]`);
+    if (activeLink) {
+      const parentLi = activeLink.closest('.toc-item-h2');
+      if (parentLi) {
+        parentLi.classList.remove("collapsed");
+      }
+    }
   },
 
   setActive(targetId) {
@@ -85,59 +98,58 @@ MathBook.toc = {
     const active = document.querySelector(`.toc a[href="#${targetId}"]`);
     if (active) {
       active.classList.add("active");
-      const parentLi = active.closest('.toc-item-h2');
-      if (parentLi) {
-        parentLi.classList.remove("collapsed");
-      }
+      // 注意：这里删除了自动 remove("collapsed") 的代码
+      // 保证滚动页面时目录不会自己弹开
     }
   },
 
   // --- 侧边栏开关逻辑 ---
+  // --- 侧边栏开关逻辑 ---
   open() {
-    document.querySelector(".sidebar")?.classList.add("open");
+    // 1. 显示侧边栏和遮罩
+    const sidebar = document.querySelector(".sidebar");
+    sidebar?.classList.add("open");
     document.querySelector(".toc-overlay")?.classList.add("show");
-    // NEW: 打开侧边栏时，强制隐藏目录按钮
+    
+    // 2. 隐藏悬浮按钮
     document.querySelector(".toc-toggle")?.classList.add("hidden");
+
+    // 3. 强制重置所有菜单为折叠状态
+    document.querySelectorAll('.toc-item-h2').forEach(li => {
+      li.classList.add('collapsed');
+    });
+    
+    // 💥 修正：滚动条通常在 .sidebar 上，而不是 #tocList 上
+    if (sidebar) {
+      sidebar.scrollTop = 0;
+    }
   },
 
   close() {
     document.querySelector(".sidebar")?.classList.remove("open");
     document.querySelector(".toc-overlay")?.classList.remove("show");
-    // NEW: 关闭侧边栏时，恢复显示目录按钮
     document.querySelector(".toc-toggle")?.classList.remove("hidden");
   },
 
   bindEvents() {
-    // 顶部汉堡菜单点击
     const toggleBtn = document.querySelector(".toc-toggle");
     toggleBtn?.addEventListener("click", (e) => {
       e.stopPropagation();
       this.open();
     });
-
-    // 遮罩层点击关闭
+    
     document.querySelector(".toc-overlay")?.addEventListener("click", () => this.close());
 
-    // NEW: 监听滚动事件，控制按钮显隐
     let lastScrollY = window.scrollY;
-    
     window.addEventListener("scroll", () => {
-      // 如果侧边栏是打开状态，不要执行滚动逻辑（保持按钮隐藏）
       if (document.querySelector(".sidebar")?.classList.contains("open")) return;
-
       const currentScrollY = window.scrollY;
-      
-      // 增加一个阈值(10px)，防止微小抖动触发
       if (Math.abs(currentScrollY - lastScrollY) < 10) return;
-
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // 向下滚动 且 滚动超过100px -> 隐藏按钮
         toggleBtn?.classList.add("hidden");
       } else {
-        // 向上滚动 -> 显示按钮
         toggleBtn?.classList.remove("hidden");
       }
-      
       lastScrollY = currentScrollY;
     });
   },
