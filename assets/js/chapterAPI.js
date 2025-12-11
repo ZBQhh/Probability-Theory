@@ -1,9 +1,9 @@
 /* ==========================================================================
    FILE: assets/js/chapterAPI.js
-   描述: 章节内容构建 API (嵌入式链接版 - 对接 Config - 含 Image 方法)
+   描述: 章节内容构建 API (支持多级标题编号 + TikZ/Image)
    ========================================================================== */
 (function() {
-  // 确保 config 已加载 (MathBook.config 必须存在)
+  // 确保 config 已加载
   const { state, counters, utils, config } = MathBook;
 
   function generateId(type, number) {
@@ -14,7 +14,7 @@
   window.chapter = function(title) {
     state.currentChapterIndex++;
     const chapterNum = state.currentChapterIndex + 1;
-    counters.reset();
+    counters.reset(); // 重置所有计数器
 
     const chap = {
       num: chapterNum,
@@ -24,13 +24,25 @@
 
       _add(html) { this.content.push(html); return this; },
       text(html) { return this._add(`<p>${html}</p>`); },
+      
+      // 💥 1. Section (二级标题)
       section(secTitle) {
         counters.increment('section');
+        
+        // 关键：进入新的一节时，重置 subsection 计数器
+        if(MathBook.counters.data) MathBook.counters.data.subsection = 0;
+
         return this._add(`<h3 id="sec-${this.num}-${counters.get('section')}" data-generated="1">${utils.escapeHtml(secTitle)}</h3>`);
       },
+
+      // 💥 2. Subsection (三级标题)
       subsection(subTitle) {
         counters.increment('subsection');
-        return this._add(`<h4 data-generated="1">${utils.escapeHtml(subTitle)}</h4>`);
+        
+        // 生成 ID: sec-{章}-{节}-{小节}
+        const id = `sec-${this.num}-${counters.get('section')}-${counters.get('subsection')}`;
+        
+        return this._add(`<h4 id="${id}" data-generated="1">${utils.escapeHtml(subTitle)}</h4>`);
       },
 
       /* 1. 普通公式 */
@@ -98,10 +110,8 @@
         `);
       },
 
-      /* 4. 图片插入 (新增!) */
+      /* 4. 图片插入 */
       image(src, caption = "", width = "100%") {
-        // 如果是 svg，width 默认给小一点可能更好看，比如 80%
-        // 但为了通用，默认给 100% 或者 auto
         return this._add(`
           <div class="block-image" style="text-align: center; margin: 2em 0;">
             <img src="${src}" alt="${utils.escapeHtml(caption)}" style="max-width: ${width}; height: auto; border-radius: 4px;">
@@ -110,7 +120,21 @@
         `);
       },
 
-      /* 5. 警告/提示/引用/代码 */
+      /* 5. TikZ 绘图 */
+      tikz(code, caption = "") {
+        return this._add(`
+          <div class="block-image block-tikz" style="text-align: center; margin: 2em 0;">
+            <script type="text/tikz">
+              \\begin{tikzpicture}
+                ${code}
+              \\end{tikzpicture}
+            </script>
+            ${caption ? `<div class="image-caption" style="font-size: 0.9em; color: var(--muted); margin-top: 0.5em; font-style: italic;">${utils.escapeHtml(caption)}</div>` : ''}
+          </div>
+        `);
+      },
+
+      /* 6. 警告/提示/引用/代码 */
       warning(title, html) {
         const titleHtml = (title && title.trim()) ? `<span class="env-title">${utils.escapeHtml(title)}</span>` : '';
         return this._add(`<div class="block type-warning" data-generated="1"><div class="env-heading"><span class="env-label">⚠️ ${config.language === 'en' ? 'Warning' : '警告'}</span>${titleHtml}</div><div class="env-body">${html}</div></div>`);
@@ -130,7 +154,7 @@
     const chapId = `chap-${chapterNum}`;
     chap.content.push(`<h2 id="${chapId}" data-generated="1">${utils.escapeHtml(title)}</h2>`);
 
-    // ==================== 批量生成环境 (读取 Config) ====================
+    // ==================== 批量生成环境 ====================
     const envKeys = Object.keys(config.environments).filter(k => k !== 'default');
     
     envKeys.forEach(type => {
@@ -149,8 +173,6 @@
         }
         
         const titleHtml = (title && title.trim()) ? `<span class="env-title">${utils.escapeHtml(title)}</span>` : '';
-        
-        // 从 Config 获取颜色和名称
         const color = utils.getEnvColor(type);
         const envName = utils.getEnvName(type);
         

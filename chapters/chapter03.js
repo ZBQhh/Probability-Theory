@@ -5,20 +5,20 @@
 chapter('二维随机变量及其分布')
   .section('二维随机变量及其联合分布')
     .definition('二维随机变量（二维随机向量）', `
-      设有随机试验E，其样本空间为 $\\Omega$。若对 $\\Omega$ 中的每一个样本点 $\\omega$ 都有一对有序实数 $(X(\\omega), Y(\\omega))$ 与其对应，则称 $(X, Y)$ 为二维随机变量或二维随机向量。称 $(X, Y)$ 的取值范围为它的值域，记为 $\\Omega_{(X,Y)}$。
+      设有随机试验E，其样本空间为 $\\Omega$.若对 $\\Omega$ 中的每一个样本点 $\\omega$ 都有一对有序实数 $(X(\\omega), Y(\\omega))$ 与其对应，则称 $(X, Y)$ 为二维随机变量或二维随机向量.称 $(X, Y)$ 的取值范围为它的值域，记为 $\\Omega_{(X,Y)}$.
     `)
-    .definition('n维随机变量（n维随机向量）', `
-      设有随机试验E，其样本空间为 $\\Omega$。若对 $\\Omega$ 中的每一个样本点 $\\omega$ 都有一组有序实数列 $(X_1(\\omega), X_2(\\omega), \\cdots, X_n(\\omega))$ 与其对应，则称 $(X_1, X_2, \\cdots, X_n)$ 为 n 维随机变量或 n 维随机向量。其值域记为 $\\Omega_{(X_1, X_2, \\cdots, X_n)}$。
+    .definition('$n$维随机变量（$n$维随机向量）', `
+      设有随机试验$E$，其样本空间为 $\\Omega$.若对 $\\Omega$ 中的每一个样本点 $\\omega$ 都有一组有序实数列 $(X_1(\\omega), X_2(\\omega), \\cdots, X_n(\\omega))$ 与其对应，则称 $(X_1, X_2, \\cdots, X_n)$ 为 $n$ 维随机变量或 $n$ 维随机向量.其值域记为 $\\Omega_{(X_1, X_2, \\cdots, X_n)}$.
     `)
     .definition('二维随机变量的联合分布函数', `
       设 $(X, Y)$ 为二维随机变量，对任意 $(x, y) \\in \\mathbb{R}^2$，称
       $$F(x, y) = P(X \\le x, Y \\le y)$$
-      为随机变量 $(X, Y)$ 的联合分布函数。
+      为随机变量 $(X, Y)$ 的联合分布函数.
     `)
     .definition('n维随机变量的联合分布函数', `
       设 $(X_1, X_2, \\cdots, X_n)$ 为 n 维随机变量，对任意 $(x_1, x_2, \\cdots, x_n) \\in \\mathbb{R}^n$，称
       $$F(x_1, \\cdots, x_n)=P(X_1\\le x_1, \\cdots, X_n \\le x_n)$$
-      为其联合分布函数。
+      为其联合分布函数.
     `)
     .property('联合分布函数的性质（二维情形）', `
       设 $F(x, y)$ 为 $(X, Y)$ 的联合分布函数，则
@@ -33,20 +33,20 @@ chapter('二维随机变量及其分布')
       </ol>
     `)
     .definition('二维离散型随机变量', `
-      若 $(X, Y)$ 仅取有限或可列个值，则称 $(X, Y)$ 为二维离散型随机变量。
+      若 $(X, Y)$ 仅取有限或可列个值，则称 $(X, Y)$ 为二维离散型随机变量.
     `)
     .definition('二维随机变量的联合分布律', `
-      若 $P(X=x_i, Y=y_j)=p_{ij}$，$i,j=1,2,\\cdots$，且 $p_{ij}\\ge 0$，$\\sum_i\\sum_j p_{ij}=1$，则称为联合分布律。
+      若 $P(X=x_i, Y=y_j)=p_{ij}$，$i,j=1,2,\\cdots$，且 $p_{ij}\\ge 0$，$\\sum_i\\sum_j p_{ij}=1$，则称为联合分布律.
     `)
     .definition('二维连续型随机变量的联合密度函数', `
       若
       $$F(x, y)=\\int_{-\\infty}^{x}\\int_{-\\infty}^{y} f(u, v) \\,du\\,dv$$
-      则 $(X, Y)$ 为二维连续型随机变量，$f(x,y)$ 为联合密度函数。
+      则 $(X, Y)$ 为二维连续型随机变量，$f(x,y)$ 为联合密度函数.
     `)
     .definition('n维连续型随机变量的联合密度函数', `
       若
       $$F(x_1,\\cdots,x_n)=\\int_{-\\infty}^{x_1}\\cdots\\int_{-\\infty}^{x_n} f(u_1,\\cdots,u_n) \\,du_1\\cdots du_n$$
-      则 $f$ 为 $n$ 维连续型随机变量的联合密度函数。
+      则 $f$ 为 $n$ 维连续型随机变量的联合密度函数.
     `)
     .property('联合密度函数的性质（二维）', `
       <ol>
@@ -70,8 +70,9 @@ chapter('二维随机变量及其分布')
         \\frac{1}{S_G}, & (x,y)\\in G, \\\\
         0, & \\text{其他}
       \\end{cases}$$
-      其中 $G$ 为区域，$S_G$ 为面积。
+      其中 $G$ 为区域，$S_G$ 为面积.
     `)
+    /*.image('assets\\images\\exponential_cdf_1.svg', '二维正态分布的联合分布函数','50%')*/
     .definition('二维正态分布 $N(\\mu_1,\\mu_2,\\sigma_1^2,\\sigma_2^2,\\rho)$', `
       $$(X, Y)\\sim N(\\mu_1,\\mu_2,\\sigma_1^2,\\sigma_2^2,\\rho)$$  
       若其密度为  

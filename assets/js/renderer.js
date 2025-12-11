@@ -33,35 +33,45 @@ MathBook.renderer = {
   },
 
   /**
-   * 2. 生成标题序号 (1.1, 1.2...)
+   * 2. 生成标题序号 (1.1, 1.2, 1.2.1...)
    */
   generateHeadingNumbering() {
     if (!this.container) return;
 
-    let h2Count = 0, h3Count = 0;
+    let h2Count = 0; // 章
+    let h3Count = 0; // 节
+    let h4Count = 0; // 小节
 
-    // 仅查询 main.content 下的标题
-    this.container.querySelectorAll("h2, h3").forEach(heading => {
+    // 💥 修改：查询 h2, h3, h4
+    this.container.querySelectorAll("h2, h3, h4").forEach(heading => {
       // 防止重复生成
       if (heading.querySelector('.heading-number')) return;
 
+      // 💥 逻辑更新：处理三级标题
       if (heading.tagName === "H2") {
         h2Count++;
         h3Count = 0;
+        h4Count = 0;
         heading.dataset.number = `${h2Count}`;
-      } else {
+      } 
+      else if (heading.tagName === "H3") {
         h3Count++;
+        h4Count = 0;
         heading.dataset.number = `${h2Count}.${h3Count}`;
+      } 
+      else if (heading.tagName === "H4") {
+        h4Count++;
+        heading.dataset.number = `${h2Count}.${h3Count}.${h4Count}`;
       }
 
-      // 确保有 ID 用于跳转
+      // 确保有 ID 用于跳转 (如果 chapterAPI 没生成，这里兜底)
       if (!heading.id) {
         heading.id = "sec-" + heading.dataset.number.replace(/\./g, "-");
       }
 
       // 插入序号 span
       const span = document.createElement("span");
-      span.className = "heading-number";
+      span.className = "heading-number"; // 样式由 base.css 控制
       span.textContent = heading.dataset.number + " ";
       heading.insertBefore(span, heading.firstChild);
     });
