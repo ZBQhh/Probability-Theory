@@ -1,20 +1,70 @@
 /* ==========================================================================
    FILE: assets/js/chapterAPI.js
-   描述: 章节内容构建 API (支持多级标题编号 + TikZ/Image)
+   描述: 章节内容构建 API (支持环境内嵌入组件版)
    ========================================================================== */
 (function() {
-  // 确保 config 已加载
   const { state, counters, utils, config } = MathBook;
 
   function generateId(type, number) {
     return `${type}-${number.replace(/\./g, '-')}`;
   }
 
+  // ==================== 0. 新增：工具函数 (用于生成 HTML 字符串) ====================
+  // 这允许你在 definition/theorem 内部手动调用生成公式组件
+  
+  utils.renderFormula = function(latex, options = {}, chapterNum) {
+    // 如果没传章节号，尝试获取当前章节
+    const cNum = chapterNum || (state.currentChapterIndex + 1);
+    const { skipNumber = false, label = null } = options;
+    
+    if (!skipNumber) counters.increment('equation');
+    const number = skipNumber ? "" : `${cNum}.${counters.get('equation')}`;
+    const id = label ? label : (skipNumber ? null : `eq-${cNum}-${counters.get('equation')}`);
+    
+    if (label && !skipNumber) state.formulaMap[label] = { number, id };
+
+    const linkHtml = (id && !skipNumber) ? `<a href="#${id}" class="permalink-formula" title="链接">¶</a>` : '';
+
+    return `
+      <div class="math-display-block" id="${id || ''}" ${skipNumber ? 'data-no-num="true"' : ''}>
+        <div class="math-scroll-view"><div class="math-content">$$${latex}$$</div></div>
+        <div class="math-info">
+          <span class="math-number">${number ? `(${number})` : ''}</span>
+          ${linkHtml}
+        </div>
+      </div>
+    `;
+  };
+
+  utils.renderFormulaColor = function(latex, options = {}, chapterNum) {
+    const cNum = chapterNum || (state.currentChapterIndex + 1);
+    const { color = "#409EFF", name = null, label = null, skipNumber = false } = options;
+    
+    if (!skipNumber) counters.increment('equation');
+    const number = skipNumber ? "" : `${cNum}.${counters.get('equation')}`;
+    const id = label ? label : (skipNumber ? null : `eq-col-${cNum}-${counters.get('equation')}`);
+    
+    if (label && !skipNumber) state.formulaMap[label] = { number, id };
+    const linkHtml = (id && !skipNumber) ? `<a href="#${id}" class="permalink-formula" title="链接">¶</a>` : '';
+
+    return `
+      <div class="math-display-block color-mode" style="--fcolor:${color}" id="${id || ''}">
+        <div class="math-scroll-view"><div class="math-content">$$${latex}$$</div></div>
+        <div class="math-info">
+          ${!skipNumber ? `<span class="math-number" style="color:${color}; font-weight:bold;">(${number})</span>` : ""}
+          ${name ? `<span class="math-name">${utils.escapeHtml(name)}</span>` : ""}
+          ${linkHtml}
+        </div>
+      </div>
+    `;
+  };
+
+
   // ==================== Chapter 主逻辑 ====================
   window.chapter = function(title) {
     state.currentChapterIndex++;
     const chapterNum = state.currentChapterIndex + 1;
-    counters.reset(); // 重置所有计数器
+    counters.reset();
 
     const chap = {
       num: chapterNum,
@@ -25,66 +75,26 @@
       _add(html) { this.content.push(html); return this; },
       text(html) { return this._add(`<p>${html}</p>`); },
       
-      // 💥 1. Section (二级标题)
+      // Section & Subsection
       section(secTitle) {
         counters.increment('section');
-        
-        // 关键：进入新的一节时，重置 subsection 计数器
         if(MathBook.counters.data) MathBook.counters.data.subsection = 0;
-
         return this._add(`<h3 id="sec-${this.num}-${counters.get('section')}" data-generated="1">${utils.escapeHtml(secTitle)}</h3>`);
       },
-
-      // 💥 2. Subsection (三级标题)
       subsection(subTitle) {
         counters.increment('subsection');
-        
-        // 生成 ID: sec-{章}-{节}-{小节}
         const id = `sec-${this.num}-${counters.get('section')}-${counters.get('subsection')}`;
-        
         return this._add(`<h4 id="${id}" data-generated="1">${utils.escapeHtml(subTitle)}</h4>`);
       },
 
-      /* 1. 普通公式 */
+      /* 1. 普通公式 (调用上面的 Utils) */
       formula(latex, options = {}) {
-        const { skipNumber = false, label = null } = options;
-        if (!skipNumber) counters.increment('equation');
-        const number = skipNumber ? "" : `${this.num}.${counters.get('equation')}`;
-        const id = label ? label : (skipNumber ? null : `eq-${this.num}-${counters.get('equation')}`);
-        if (label && !skipNumber) state.formulaMap[label] = { number, id };
-
-        const linkHtml = (id && !skipNumber) ? `<a href="#${id}" class="permalink-formula" title="链接">¶</a>` : '';
-
-        return this._add(`
-          <div class="math-display-block" id="${id || ''}" ${skipNumber ? 'data-no-num="true"' : ''}>
-            <div class="math-scroll-view"><div class="math-content">$$${latex}$$</div></div>
-            <div class="math-info">
-              <span class="math-number">${number ? `(${number})` : ''}</span>
-              ${linkHtml}
-            </div>
-          </div>
-        `);
+        return this._add(utils.renderFormula(latex, options, this.num));
       },
 
-      /* 2. 彩色公式 */
+      /* 2. 彩色公式 (调用上面的 Utils) */
       formulaColor(latex, options = {}) {
-        const { color = "#409EFF", name = null, label = null, skipNumber = false } = options;
-        if (!skipNumber) counters.increment('equation');
-        const number = skipNumber ? "" : `${this.num}.${counters.get('equation')}`;
-        const id = label ? label : (skipNumber ? null : `eq-col-${this.num}-${counters.get('equation')}`);
-        if (label && !skipNumber) state.formulaMap[label] = { number, id };
-        const linkHtml = (id && !skipNumber) ? `<a href="#${id}" class="permalink-formula" title="链接">¶</a>` : '';
-
-        return this._add(`
-          <div class="math-display-block color-mode" style="--fcolor:${color}" id="${id || ''}">
-            <div class="math-scroll-view"><div class="math-content">$$${latex}$$</div></div>
-            <div class="math-info">
-              ${!skipNumber ? `<span class="math-number" style="color:${color}; font-weight:bold;">(${number})</span>` : ""}
-              ${name ? `<span class="math-name">${utils.escapeHtml(name)}</span>` : ""}
-              ${linkHtml}
-            </div>
-          </div>
-        `);
+        return this._add(utils.renderFormulaColor(latex, options, this.num));
       },
 
       /* 3. 公式盒子 */
@@ -173,6 +183,7 @@
         }
         
         const titleHtml = (title && title.trim()) ? `<span class="env-title">${utils.escapeHtml(title)}</span>` : '';
+        
         const color = utils.getEnvColor(type);
         const envName = utils.getEnvName(type);
         
