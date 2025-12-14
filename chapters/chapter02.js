@@ -2,202 +2,212 @@
    FILE: chapters/chapter02.js
    描述: 第2章 随机变量及其分布
    == */
-chapter('随机变量及其分布')
-  .section('随机变量及分布')
+chapter('随机事件和概率')
+  .text(`随机事件是样本空间的子集,这种表达方式对于全面描述和研究随机现象的统计规律性具有很大的局限性,并且不利于其他数学工具的运用,本章引人随机变量和分布函数的概念,随机变量提供了用数值描述随机事件的方法,分布函数给出了随机变量取值规律性的一种表示,这些概念在概率论和数理统计中起着基本的作用,本章先学习离散型随机变量．`)
+  .section('随机变量')
+  .text(`概率论的基本任务就是研究随机变量取值的统计规律性.`)
     .definition('随机变量', `
-      在随机试验$E$中,$\\Omega$是相应的样本空间,如果对$\\Omega$中的每一个样本点$\\omega$,有唯一一个实数$X(\\omega)$与它对应,那么就把这个定义域为$\\Omega$的单值实值函数$X=X(\\omega)$称为(一维)随机变量.
+      设$\\Omega$为某一随机试验的样本空间,如果对于每一个样本点$\\omega\\in\\Omega$,有一个实数$X(\\omega)$与之对应,这样就定义了一个定义域为$\\Omega$的实值函数$X=X(\\omega)$,称之为随机变量.
     `)
-    .definition('分布函数', `
-      设$X$是一个随机变量,对于任意实数$x$,称函数
-      $$F(x) = P(X \\leqslant x), \\quad -\\infty < x < +\\infty$$
-      为随机变量$X$的分布函数.
-    `)
-    .property('分布函数的性质', `
+    .remark('', `
       <ol>
-        <li>对于任意实数$x$,有$$
-\\begin{align*}
-        0 \\leqslant F(x) \\leqslant 1\\\\   \\lim\\limits_{x \\to -\\infty} F(x) = 0\\\\
-    \\lim\\limits_{x \\to +\\infty} F(x) = 1\\end{align*}$$</li>
-        <li>$F(x)$单调不减,即当$x_1 < x_2$时,有$$F(x_1) \\leqslant F(x_2)$$</li>
-        <li>$F(x)$是$x$的右连续函数,即$\\lim\\limits_{x \\to x_0^+} F(x) = F(x_0)$</li>
-        <li>$P(X < x) = F(x^-)$</li>
+        <li>通常,用$X, Y, Z$等表示随机变量.</li>
+        <li>事实上,$X$是一个随机函数,它的定义域为样本空间,自变量为样本点；$X$的取值有随机性,在未做试验之前,我们并不知道此次试验会出现哪个样本点,因此也不知道$X$的取值为哪个实数.</li>
       </ol>
+      随机事件可用随机变量的某个取值或某些取值所满足的等式、不等式来描述,从而随机事件的概率就可以表示为随机变量取不同值的概率.
     `)
-    .property('分布函数计算概率', `
-      对任意的两个常数$-\\infty < a < b < +\\infty$,有
-      $$P(a < X \\leqslant b) = F(b) - F(a).$$
-    `)
-  .section('一维离散型随机变量')
+  .section('离散型随机变量及其分布律')
     .definition('离散型随机变量', `
-      设$E$是随机试验,$\\Omega$是相应的样本空间,$X$是$\\Omega$上的随机变量,若$X$的值域(记为$\\Omega_X$)为有限集或可列集,此时称$X$为(一维)离散型随机变量.
+      如果随机变量$X$的全部可能的取值是有限个或可列无穷多个,亦即它的值为$x_{1},x_{2},\\cdots,x_{n}$或$x_{1},x_{2},x_{3},\\cdots$,则称$X$为离散型随机变量.对于离散型随机变量,只要知道它的所有可能的取值,以及它取这些值的概率,便完全掌握了这个随机变量.
     `)
-    .definition('分布律（分布列/概率函数）', `
-      若一维离散型随机变量$X$的取值为$x_1, x_2, \\cdots, x_n, \\cdots$,称相应的概率
-      $$P(X = x_i) = p_i, \\quad i=1,2,\\cdots$$
-      为离散型随机变量$X$的分布律.且满足：
-      <ol>
-        <li>（非负性）$p_i \\geqslant 0, \\quad i=1,2,\\cdots$;</li>
-        <li>（规范性）$\\sum\\limits_{i=1}^{+\\infty} p_i = 1$.</li>
-      </ol>
-      分布律常用下表表示：
+    .text( `
+      设$X$为离散型随机变量,它的所有可能取值为$x_{k}$,令
+      $$p_{k}=P\\{\\omega:X(\\omega)=x_{k}\\},\\quad(k=1,2,\\cdots)$$
+      表示$X(\\omega)=x_{k}$的概率.简写为$(X=x_{k})$或$\\{X=x_{k}\\}$.由概率的性质易知：
+      <ul>
+        <li>（非负性）$p_{k}>0\\quad $</li>
+        <li>（规范性）$\\sum_{k=1}^{\\infty} p_{k}=1 \\quad $    </li>
+      </ul>
+      称满足上式的$\\{p_{k}\\}$为随机变量$X$的分布律.它们也可以用下表来表示.
       
     `)
-    .text(`$$\\begin{array}{c|cccccc}
-      \\hline
-X & x_1 & x_2 & \\cdots & x_n & \\cdots \\\\ \\hline
-\\text{概率} & p_1 & p_2 & \\cdots & p_n & \\cdots \\\\ \\hline
-\\end{array}$$`)
-  .section('一维连续型随机变量')
-    .definition('连续型随机变量', `
-      设$E$是随机试验,$\\Omega$是相应的样本空间,$X$是$\\Omega$上的随机变量,$F(x)$是$X$的分布函数,若存在非负函数$f(x)$使得
-      $$F(x) = \\int_{-\\infty}^{x} f(t) dt,$$
-      则称$X$为(一维)连续型随机变量.其取值充满了数轴上的一个区间(或某几个区间的并).
-    `)
-    .property('（概率）密度函数', `
-      $f(x)$称为$X$的(概率)密度函数,满足：
-      <ol>
-        <li>（非负性）$f(x) \\geqslant 0, \\quad -\\infty < x < +\\infty$;</li>
-        <li>（规范性）$\\int_{-\\infty}^{+\\infty} f(x) dx = 1$.</li>
-      </ol>
-    `)
-    .property('连续型随机变量的性质', `
-      <ol>
-        <li>分布函数$F(x)$是连续函数,在$f(x)$的连续点处,$F^{\\prime}(x) = f(x)$;</li>
-        <li>对任意一个常数$c$,$P(X=c)=0$.所以,在事件$\\{a \\leqslant X \\leqslant b\\}$中剔除$X=a$或$X=b$,都不影响概率的大小,即
-        $$P(a \\leqslant X \\leqslant b) = P(a < X \\leqslant b) = P(a \\leqslant X < b) = P(a < X < b).$$</li>
-        <li>对任意的两个常数$a, b$,$P(a < X \\leqslant b) = \\int_{a}^{b} f(x) dx$.</li>
-      </ol>
-    `)
-  .section('常用的离散型随机变量')
-    .definition('伯努利(Bernoulli)试验', `
-      设对一随机试验$E$,只关心某一事件$A$发生还是不发生,即该随机试验只有两种可能的试验结果：$A$和$\\overline{A}$,则称这样的随机试验叫伯努利试验.
-    `)
-    .definition('$n$重伯努利试验', `
-      设事件$A$在一次试验中发生的概率$P(A)=p(0 < p < 1)$,则$P(\\overline{A})=1-p$.将该随机试验独立重复地进行$n$次,则称这$n$次独立重复试验叫$n$重伯努利试验.
-    `)
-    .definition('二项分布 $B(n, p)$', `
-      记随机变量$X$表示在$n$重伯努利试验中$A$事件发生的次数,则$X$的取值为$0, 1, 2, \\cdots, n$,相应的分布律为
-      $$
-P(X = k) = \\binom{n}{k} p^{k}(1-p)^{n-k},
-\\quad 0 < p < 1,\\quad k = 0,1,\\ldots,n.
+    .text(`
 $$
-
-      称随机变量$X$服从参数为$n, p$的二项分布,记为$X \\sim B(n, p)$.
-    `)
-    .definition('$0-1$分布 $B(1, p)$', `
-      二项分布$B(n, p)$中,当$n=1$时,$X \\sim B(1, p)$,即有
-      $$
-P(X = k) = p^{k}(1-p)^{1-k},
-\\quad 0 < p < 1,\\quad k = 0,1.
-$$
-    `)
-    .definition('泊松分布 $P(\\lambda)$', `
-      设随机变量$X$的取值为$0, 1, 2, \\cdots, n, \\cdots$,相应的分布律为
-      $$P(X=k)=\\frac{\\lambda^{k}}{k!}e^{-\\lambda}, \\quad \\lambda>0, \\quad k=0, 1, 2, \\cdots, n, \\cdots.$$
-      称随机变量$X$服从参数为$\\lambda$的泊松分布,记为$X \\sim P(\\lambda)$.
-    `)
-    .theorem('泊松定理', `
-      在$n$重伯努利试验中,记$A$事件在一次试验中发生的概率为$p_n$,如果当$n \\to +\\infty$时,有$np_n \\to \\lambda(\\lambda>0)$,则
-      $$\\lim\\limits_{n \\to +\\infty} \\binom{n}{k} p_{n}^{k}(1-p_{n})^{n-k} = \\frac{\\lambda^{k}}{k!}e^{-\\lambda}.$$
-      `)
-    .text(`泊松定理告诉我们,在二项分布计算中,当$n$较大$p$较小而$np=\\lambda$适中时,常用泊松分布近似二项分布.
-    `)
-    .definition('超几何分布 $H(N, M, n)$', `
-      设有$N$件产品,其中有$M(M \\leqslant N)$件是不合格品.若从中不放回地抽取$n(n \\leqslant N)$件,设其中含有的不合格品的件数为$X$,则$X$的分布律为
-      $$P(X=k) = \\frac{\\binom{M}{k}\\binom{N-M}{n-k}}{\\binom{N}{n}}, \\quad k = \\max(0, n+M-N), \\cdots, \\min(n, M).$$
-      称$X$服从参数为$N, M$和$n$的超几何分布,记为$X \\sim H(N, M, n)$,其中$N, M$和$n$均为正整数.
-    `)
-    .definition('几何分布 $G(p)$',`
-      在伯努利试验中,记每次试验中$A$事件发生的概率$P(A)=p(0 < p < 1)$.设随机变量$X$表示$A$事件首次出现时已经试验的次数,则$X$的取值为$1, 2, \\cdots, n, \\cdots$,相应的分布律为
-      $$P(X=k)=p(1-p)^{k-1},\\quad 0 < p < 1,\\quad k=1, 2, \\cdots, n, \\cdots.$$
-      称随机变量$X$服从参数为$p$的几何分布,记为$X \\sim Ge(p)$.
-    `)
-    .definition('负二项分布 $NB(r, p)$', `
-      在伯努利试验中,记每次试验中$A$事件发生的概率为$P(A)=p(0 < p < 1)$.设随机变量$X$表示$A$事件第$r$次出现时已经试验的次数,则$X$的取值为$r, r+1, \\cdots, r+n, \\cdots$,相应的分布律为
-      $$P(X=k)=\\binom{k-1}{r-1} p^{r}(1-p)^{k-r},\\quad 0 < p < 1,\\quad k=r, r+1, \\cdots, r+n, \\cdots.$$
-      称随机变量$X$服从参数为$r, p$的负二项分布,记为$X \\sim NB(r, p)$.当$r=1$时,即为几何分布.
-    `)
-  .section('常用的连续型随机变量')
-    .definition('均匀分布 $U(a, b)$', `
-      随机变量$X$的取值范围为区间$(a, b)(a < b)$,密度函数和分布函数为：
-      $$f(x) = \\begin{cases} \\frac{1}{b-a}, & a < x < b, \\\\ 0, & \\text{其他}. \\end{cases}$$
-      $$F(x) = \\begin{cases} 0, & x < a, \\\\ \\frac{x-a}{b-a}, & a \\leqslant x < b, \\\\ 1, & x \\geqslant b. \\end{cases}$$
-      记为$X \\sim U(a, b)$.
-    `)
-    .tikz(`
-     % 画坐标轴
-    \\draw[->] (-3,0) -- (3,0) node[right] {$x$};
-    \\draw[->] (0,0) -- (0,1.5) node[above] {$f(x)$};
-    
-    % 画正态分布曲线
-    \\draw[domain=-2.5:2.5, smooth, variable=\\x, blue, thick] plot ({\\x}, {exp(-(\\x*\\x)/2)});
-    
-    % 画辅助线和标注 (模拟 mu 和 sigma)
-    \\draw[dashed] (0,0) -- (0,1); 
-    \\draw[dashed] (1,0) -- (1,0.6);
-    \\draw[dashed] (-1,0) -- (-1,0.6);
-    
-    \\node[below] at (0,0) {$\\mu$};
-    \\node[below] at (1,0) {$\\mu+\\sigma$};
-    \\node[below] at (-1,0) {$\\mu-\\sigma$};
-  `, '动态渲染的 TikZ 图')
-    .definition('指数分布 $E(\\lambda)$', `
-      随机变量$X$的取值范围为区间$(0, +\\infty)$,密度函数和分布函数为：
-      $$f(x) = \\begin{cases} \\lambda e^{-\\lambda x}, & x > 0, \\\\ 0, & \\text{其他}. \\end{cases}$$
-      $$F(x) = \\begin{cases} 0, & x < 0, \\\\ 1 - e^{-\\lambda x}, & x \\geqslant 0. \\end{cases}$$
-      记为$X \\sim E(\\lambda)$.
-    `)
-    .definition('正态分布 $N(μ, σ²)$', `
-      设随机变量$X$的取值范围为$\\mathbb{R}$,密度函数和分布函数为：
-      $$f(x) = \\frac{1}{\\sqrt{2\\pi}\\sigma} e^{-\\frac{(x-\\mu)^{2}}{2\\sigma^{2}}}, \\quad -\\infty < x < +\\infty.$$
-      $$F(x) = \\int_{-\\infty}^{x} \\frac{1}{\\sqrt{2\\pi}\\sigma} e^{-\\frac{(t-\\mu)^{2}}{2\\sigma^{2}}} dt, \\quad -\\infty < x < +\\infty.$$
-      记为$X \\sim N(\\mu, \\sigma^{2})$.
-    `)
-    .definition('标准正态分布 $N(0, 1)$', `
-      随机变量$X$的取值范围为$\\mathbb{R}$,密度函数和分布函数为：
-      $$f(x) = \\frac{1}{\\sqrt{2\\pi}} e^{-\\frac{x^{2}}{2}} \\triangleq \\varphi(x), \\quad -\\infty < x < +\\infty.$$
-      $$F(x) = \\int_{-\\infty}^{x} \\frac{1}{\\sqrt{2\\pi}} e^{-\\frac{t^{2}}{2}} dt \\triangleq \\Phi(x), \\quad -\\infty < x < +\\infty.$$
-      记为$X \\sim N(0, 1)$.
-    `)
-    .theorem('正态分布的概率计算', `
-      <ul>
-        <li>若$X \\sim N(0,1)$,则$P(a < X \\leqslant b) = \\Phi(b) - \\Phi(a)$.</li>
-        <li>若$X \\sim N(\\mu, \\sigma^{2})$,则$P(a < X \\leqslant b) = \\Phi(\\frac{b-\\mu}{\\sigma}) - \\Phi(\\frac{a-\\mu}{\\sigma})$.</li>
-      </ul>
-      其中$\\Phi(x)$的值,当$x \\geqslant 0$时可从正态分布表直接查得;当$x < 0$时,可用公式$\\Phi(x) = 1 - \\Phi(-x)$求得.
-    `)
-    .definition('标准正态分布的α分位数', `
-      当$X \\sim N(0,1)$时,满足概率表达式$P(X \\leqslant u_{\\alpha}) = \\alpha$的$u_{\\alpha}$称为标准正态分布的$\\alpha$分位数.
-    `)
-  .section('随机变量函数的分布')
-    .definition('一维离散型随机变量函数的分布', `
-      设$X$为一维离散型随机变量,分布律为$P(X=x_{i})=p_{i}(i=1,2,\\cdots)$,$Y=g(x)$为任一函数,则随机变量$Y=g(X)$的取值为$g(x_{i})$,$i=1,2,\\cdots$,相应的分布律为
-    $$
 \\begin{array}{c|cccc}
 \\hline
-Y = g(X) & g(x_1) & \\cdots & g(x_i) & \\cdots \\\\
+X & x_1 & x_2 & \\cdots & x_n \\\\
 \\hline
-\\text{概率} & p_1 & \\cdots & p_i & \\cdots\\\\ \\hline
+P & p_1 & p_2 & \\cdots & p_n \\\\
+\\hline
 \\end{array}
+
 $$
+
+`)
+    .text(`下面介绍三种最重要的离散型随机变量及其分布.`)
+  .subsection('两点分布')
   
-      注意：与$g(x_{i})$取相同值对应的那些概率应合并相加.
+    .definition('两点分布（$0-1$分布）', `
+      若随机变量$X$只能取$0$和$1$这两个值,且它的分布律为
+      $$P\\{X=1\\}=p,\\quad P\\{X=0\\}=1-p,\\quad 0 < p < 1$$
+      则称$X$服从参数为$p$的两点分布或0-1分布,可将上面两个式子合并成一个表达式
+      $$P\\{X=k\\}=p^{k}(1-p)^{1-k},\\quad k=0,1,0 < p < 1.$$
+      其表格形式如表所示.
     `)
-    .definition('一维连续型随机变量函数分布的求解步骤', `
-      设连续型随机变量$X$的密度函数为$f_X(x)$,当$Y=g(X)$是连续型随机变量时,其分布函数与概率密度函数求解的一般步骤如下：
+    .text(`$$
+\\begin{array}{c|cc}
+\\hline
+X & 0 & 1 \\\\
+\\hline
+P & 1-p & p \\\\
+\\hline
+\\end{array}
+$$`)
+    .subsection('二项分布')
+    .definition('二项分布', `
+      若随机变量$X$的分布律为
+      $$P\\{X=k\\}=C_{n}^{k}p^{k}(1-p)^{n-k},\\quad k=0,1,2,\\cdots, n;$$
+      则称$X$服从参数为$n,p$的二项分布,记为$X\\sim B(n,p)$,$0 < p < 1$.
+    `)
+    .text(`
       <ol>
-        <li>由随机变量$X$的取值范围$\\Omega_X$确定随机变量$Y$的取值范围$\\Omega_Y$;</li>
-        <li>对任意一个$y \\in \\Omega_Y$,求出
-        $$F_Y(y)=P(Y \\leqslant y)=P(g(X) \\leqslant y)=P\\{X \\in G_{y}\\}=\\int_{G_{y}} f_X(x)dx,$$
-        其中$\\{X \\in G_{y}\\}$是与$\\{g(X) \\leqslant y\\}$相同的随机事件,而$G_{y}=\\{x:g(x) \\leqslant y\\}$是实数轴上的某个集合（通常是一个区间或若干个区间的并集）;</li>
-        <li>按分布函数的定义写出$F_{Y} (y),-\\infty < y < +\\infty$;</li>
-        <li>通过对分布函数求导,得到$Y$的密度函数$$f_{Y}(y)=F_{Y}^{\\prime}(y),-\\infty < y < + \\infty$$</li>
+        <li>特别地,当$n=1$时,二项分布即为两点分布,可记为$B(1,p)$.</li>
+        <li>通常记$q=1-p$,则有
+        $$P\\{X=k\\}=C_{n}^{k}p^{k}q^{n-k},\\quad k=0,1,2,\\cdots, n.$$
+        它恰好是二项式$(p+q)^{n}$的展开式中的第$k+1$项,这正是二项分布名称的由来.</li>
       </ol>
     `)
-    .theorem('连续型随机变量单调函数分布的结论', `
-      设连续型随机变量$X$的密度函数为$f_X(x)$,$Y=g(X)$是连续型随机变量,若$y=g(x)$为严格单调函数,$x=g^{-1}(y)$为相应的反函数,且为可导函数,则$Y=g(X)$的密度函数为
-      $$f_Y(y)=f_X(g^{-1}(y)) \\times |[g^{-1}(y)]^\\prime|.$$
+    .property('二项分布的性质', `
+      <ol>
+        <li>（非负性）$$P\\{X=k\\}=C_{n}^{k}p^{k}q^{n-k}>0,\\quad k=0,1,2,\\cdots,n$$</li>
+        <li>（规范性）$$\\sum\\limits_{k=0}^{n}P\\{X=k\\}=\\sum\\limits_{k=0}^{n}C_{n}^{k}p^{k}q^{n-k}=(p+q)^{n}=1.$$</li>
+      </ol>
+      显然,二项分布中计算概率$P\\{X=k\\}$的公式与$n$次独立重复试验中事件$A$发生$k$次的概率$p_{n}(k)$是完全相同的.
     `)
-    .theorem('正态分布的线性变换性质', `
-      设$X \\sim N(\\mu, \\sigma^{2})$,则当$k \\neq 0$时,$$Y = kX + b \\sim N(k\\mu + b, k^{2}\\sigma^{2})$$特别地,$$\\frac{X-\\mu}{\\sigma} \\sim N(0,1)$$
+    .subsection('泊松分布')
+    .definition('泊松(Poisson)分布', `
+      若随机变量$X$的分布律为
+      $$P\\{X=k\\}=\\frac{\\lambda^{k}}{k!}e^{-\\lambda},\\quad k=0,1,2,\\cdots,\\lambda>0,$$
+      则称$X$服从参数为$\\lambda$的泊松(Poisson)分布,记为$X\\sim P(\\lambda)$.
     `)
+    .property('泊松分布的性质', `
+      容易验证它满足分布律的两条性质：
+      <ol>
+        <li>（非负性）$$P\\{X=k\\}=\\frac{\\lambda^{k}}{k!}e^{-\\lambda}>0,\\quad k=0,1,2,\\cdots,\\lambda>0$$</li>
+        <li>（规范性）$$\\sum\\limits_{k=0}^{\\infty}P\\{X=k\\}=\\sum\\limits_{k=0}^{\\infty}\\frac{\\lambda^{k}}{k!}e^{-\\lambda}=e^{\\lambda}e^{-\\lambda}=1.$$</li>
+      </ol>
+    `)
+    .theorem('泊松定理', `
+      在$n$次独立的重复试验中,事件$A$在一次试验中出现的频率为$p_n$(与试验总数$n$有关),如果当$n \\to \\infty$时,有$np_n \\to \\lambda(\\lambda>0$为常数),则
+      $$\\lim_{n \\to \\infty} C_n^{k} p_n^{k}(1-p_n)^{n-k} = \\frac{\\lambda^{k}}{k!}e^{-\\lambda},\\quad k=0,1,2,\\cdots.$$
+    `)
+    .remark('', `
+      <ol>
+        <li>由定理知,当$n$充分大时,令$\\lambda=np$（为保证计算的精确度,还要求$\\lambda=np$不太大）,则有如下的泊松近似公式：
+        $$C_n^{k} p^{k}(1-p)^{n-k} \\approx \\frac{\\lambda^{k}}{k!}e^{-\\lambda},\\quad k=0,1,2,\\cdots,\\lambda=np.$$</li>
+        <li>在实际计算中,若$X \\sim B(n,p)$,当$n \\geqslant 10$,$p \\leqslant 0.1$时均可用泊松分布近似计算其概率,当$n \\geqslant 100$,$np \\leqslant 10$时,效果更佳.</li>
+      </ol>
+    `)
+  .subsection('几何分布')
+    .definition('几何分布 $G(p)$', `
+      从一批次品率为$p(0 < p < 1)$的产品中逐个随机抽取产品进行检验,验后放回再抽取下一件,直到抽到次品为止.设检验的次数为$X$,则$X$可能取的值为$1,2,3,\\cdots$,其概率分布为
+      $$P\\{X=k\\}=(1-p)^{k-1}p,\\quad k=1,2,\\cdots,$$
+      称这种概率分布为几何分布,记为$X \\sim G(p)$.
+      
+    `)
+    .text(`几何分布的意义是,在伯努利试验中,每次试验成功的概率为$p$,则获得首次成功所需试验次数$X$服从几何分布.`)
+  .subsection('超几何分布')
+    .definition('超几何分布 $H(n,M,N)$', `
+      设一批产品共有$N$个,其中$M$个次品,现从中任取$n$个$(n \\le N-M)$,则这$n$个产品中所含的次品数$X$是一个离散型随机变量,$X$所有可能的取值为$0,1,2,\\cdots,j$,其中$j=\\min\\{M,n\\}$,其概率分布为
+      $$P\\{X=k\\}=\\frac{C_{M}^{k}C_{N-M}^{n-k}}{C_{N}^{n}},\\quad k=0,1,2,\\cdots, j; j=\\min\\{M,n\\},$$
+      称为超几何分布,记作$X \\sim H(n,M,N)$.
+    `)
+    .remark('', `
+      超几何分布与二项分布很相似,这两个概率分布的主要区别在于：超几何分布中的各次试验不是独立的,而且各次试验中成功的概率不等.超几何分布可以简单地理解为不放回抽样的问题,二项分布可以理解为有放回抽样问题.当$n \\ll N$时,即抽取个数$n$远小于总数$N$时,每次抽取后,总体中不合格品率$p=M/N$改变甚微,所以不放回抽样可以近似地看成有放回抽样,这时超几何分布可用二项分布近似,即
+      $$\\frac{C_{M}^{k}C_{N-M}^{n-k}}{C_{N}^{n}} \\approx C_{n}^{k}p^{k}(1-p)^{n-k},\\quad k=0,1,2,\\cdots, n,\\quad p=\\frac{M}{N}.$$
+    `)
+  .section('二维离散型随机变量及其分布')
+  .subsection('联合分布律')
+    .definition('二维随机变量（向量）', `
+      给定一个随机试验,$\\Omega$是它的样本空间,如果对$\\Omega$中的每一个样本点$\\omega$,有一对有序实数$(X(\\omega),Y(\\omega))$与它对应,那么就把这样一个定义域为$\\Omega$,取值为$(X,Y)=(X(\\omega),Y(\\omega))$的变量称为二维随机变量(向量).
+    `)
+    .text(`
+      如果二维随机变量$(X,Y)$所有可能取值是有限对或可数无限对,则称$(X,Y)$是二维离散型随机变量.
+    `)
+    .text( `
+      设二维离散型随机变量$(X,Y)$所有可能取值为$(x_i, y_j), i,j=1,2,\\cdots$,记
+      $$P\\{X=x_i, Y=y_j\\}=p_{ij},\\quad i,j=1,2,\\cdots,$$
+      则由概率的定义有
+      $$p_{ij} \\geqslant 0,\\quad \\sum_{i=1}^{+\\infty}\\sum_{j=1}^{+\\infty} p_{ij}=1.$$
+      称$P\\{X=x_i, Y=y_j\\}=p_{ij}, i,j=1,2,\\cdots$为二维离散型随机变量$(X,Y)$的分布律,或称为随机变量$X$和$Y$的联合分布律.
+    `)
+    .text(`联合分布律可用下表表示.
+      `)
+      .text(`$$
+\\begin{array}{c|ccccc}
+\\hline
+Y\\backslash X & x_1 & x_2 & \\cdots & x_i & \\cdots \\\\
+\\hline
+y_1 & p_{11} & p_{21} & \\cdots & p_{i1} & \\cdots \\\\
+y_2 & p_{12} & p_{22} & \\cdots & p_{i2} & \\cdots \\\\
+\\vdots & \\vdots & \\vdots &  & \\vdots &  \\\\
+y_j & p_{1j} & p_{2j} & \\cdots & p_{ij} & \\cdots \\\\
+\\vdots & \\vdots & \\vdots &  & \\vdots &  \\\\
+\\hline
+\\end{array}
+$$`)
+
+  .subsection('边缘分布律')
+    .definition('边缘分布律', `
+      如果$(X,Y)$是离散型的随机变量,$p_{ij}=P\\{X=x_i, Y=y_j\\}$,则称
+      $$P\\{X=x_i\\}=\\sum_{j=1}^{\\infty} p_{ij}=p_{i \\cdot}$$
+      为随机分量$X$的边缘分布律.同理,称
+      $$P\\{Y=y_j\\}=\\sum_{i=1}^{\\infty} p_{ij}=p_{\\cdot j}$$
+      为随机分量$Y$的边缘分布律.边缘分布律与联合分布律的关系可用表描述.
+      
+    `)
+    .text(`$$
+\\begin{array}{c|ccccc|c}
+\\hline
+Y\\backslash X & x_1 & x_2 & \\cdots & x_i & \\cdots & P\\{Y=y_j\\}=p_{\\cdot j} \\\\
+\\hline
+y_1 & p_{11} & p_{21} & \\cdots & p_{i1} & \\cdots & \\sum_{i=1}^{\\infty} p_{i1} \\\\
+y_2 & p_{12} & p_{22} & \\cdots & p_{i2} & \\cdots & \\sum_{i=1}^{\\infty} p_{i2} \\\\
+\\vdots & \\vdots & \\vdots &  & \\vdots &  &  \\\\
+y_j & p_{1j} & p_{2j} & \\cdots & p_{ij} & \\cdots & \\sum_{i=1}^{\\infty} p_{ij} \\\\
+\\vdots & \\vdots & \\vdots &  & \\vdots &  &  \\\\
+\\hline
+P\\{X=x_i\\}=p_{i\\cdot}
+& \\sum_{j=1}^{\\infty} p_{1j}
+& \\sum_{j=1}^{\\infty} p_{2j}
+& \\cdots
+& \\sum_{j=1}^{\\infty} p_{ij}
+& \\cdots
+& 1 \\\\
+\\hline
+\\end{array}
+$$
+`)
+  .section('随机变量的独立性与条件分布')
+  .text(`在多维随机变量中,各分量的取值有时会相互影响,有时也会毫无影响．譬如一个人的身高$X$和体重$Y$就会相互影响,但对考试成绩 $Z$一般无影响．当两个随机变量的取值互不影响时,就称它们是相互独立的．`)
+    .definition('二维离散型随机变量相互独立', `
+      设二维离散型随机变量$(X,Y)$的联合概率分布为
+      $$P\\{X=x_{i}, Y=y_{j}\\}=p_{i j},\\quad i, j=1,2, \\cdots,$$
+      如果联合概率函数恰为两个边缘概率函数的乘积,即
+      $$p_{i j}=p_{i \\cdot} p_{\\cdot j},\\quad i, j=1,2, \\cdots,$$
+      那么,称随机变量$X$与$Y$相互独立.
+    `)
+    .definition('$n$个随机变量相互独立', `
+      如果$n$维随机变量$(X_{1},X_{2},\\cdots,X_{n})$的联合概率函数恰为$n$个边缘概率函数的乘积,即对$X_{i}$的值域中任意一个值$x_{i},i=1,\\cdots,n$,总有
+      $$P\\{X_{1}=x_{1},\\cdots, X_{n}=x_{n}\\}=\\prod_{i=1}^{n} P\\{X_{i}=x_{i}\\}$$
+      那么,称$n$个随机变量$(X_{1},X_{2},\\cdots,X_{n})$相互独立.
+    `)
+    .definition('二维离散随机变量的条件分布律', `
+      设$(X,Y)$是二维离散随机变量,对于固定的$j$,若$P\\{Y=y_{j}\\}>0$,则称
+      $$P\\{X=x_{i}\\mid Y=y_{j}\\}=\\frac{P\\{X=x_{i},Y=y_{j}\\}}{P\\{Y=y_{j}\\}}=\\frac{p_{ij}}{p_{\\cdot j}},\\quad i=1,2,\\cdots$$
+      为在$Y=y_{j}$条件下随机变量$X$的条件分布律.同样,对于固定的$i$,若$P\\{X=x_{i}\\}>0$,则称
+      $$P\\{Y=y_{j}\\mid X=x_{i}\\}=\\frac{P\\{X=x_{i},Y=y_{j}\\}}{P\\{X=x_{i}\\}}=\\frac{p_{ij}}{p_{i\\cdot}},\\quad j=1,2,\\cdots,\\qquad(2.4.2)$$
+      为在$X=x_{i}$条件下随机变量$Y$的条件分布律.
+    `)
+  .section('随机变量函数的分布')
+  .text(`在实际应用领域中，很多随机变量之间具有函数关系，如果随机变量$X$具有某种分布率，如何求出$x$的函数$Y=g(X)$的分布？本节的内容就是介绍根据随机变量$X$的概率分布，求其函数$Y=g(X)$的概率分布的方法．`)

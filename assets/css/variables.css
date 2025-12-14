@@ -6,10 +6,10 @@
   /* ==================== 1. 字体设置 (按需修改) ==================== */
   
   /* [标题字体] 指定 Source Han Sans SC */
-  --font-heading: "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-heading: "Source Han Sans SC", "Noto Sans SC","Microsoft YaHei", sans-serif;
   
   /* [正文字体] 保持衬线体适合阅读 */
-  --font-body: "Source Han Sans SC", "Songti SC", "Times New Roman", serif;
+  --font-body: "Source Han Sans SC", "Microsoft YaHei","Songti SC", "Times New Roman", serif;
   /* 代码字体 */
   --font-mono: "Fira Code", monospace;
 

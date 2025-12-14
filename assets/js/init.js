@@ -57,3 +57,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 });
+// 💥 定义全局快捷函数 (所有章节都能直接用，不用再 const 了)
+window.formula = MathBook.templates.formula;
+window.formulaColor = MathBook.templates.formulaColor;
